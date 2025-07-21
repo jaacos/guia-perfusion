@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Rápida de Perfusión (Diluciones en 50cc)</title>
+    
+    <!-- Enlace al Manifest para la PWA -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags para PWA en iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Guía Perfusión">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/1f2937/ffffff?text=Gu%C3%ADa">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Gris oscuro para el fondo */
+            color: #f3f4f6; /* Texto claro */
+        }
+        .card {
+            background-color: #1f2937; /* Gris un poco más claro para las tarjetas */
+            border: 1px solid #374151;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            border-bottom: 1px solid #374151;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+        }
+        .card-content {
+            flex-grow: 1;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #374151;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #d1d5db;
+            flex-shrink: 0;
+            margin-right: 1rem;
+        }
+        .info-value {
+            text-align: right;
+            color: #f9fafb;
+        }
+        #searchInput {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #f3f4f6;
+        }
+        #searchInput::placeholder {
+            color: #9ca3af;
+        }
+        .highlight {
+            background-color: #facc15; /* Amarillo para resaltar */
+            color: #1f2937;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-white">Guía Rápida de Perfusión</h1>
+            <p class="text-lg text-gray-400 mt-2">Todas las diluciones estandarizadas a <span class="font-semibold text-white">50cc</span>. Busca un fármaco para ver los detalles.</p>
+        </header>
+
+        <!-- Barra de Búsqueda -->
+        <div class="mb-8 sticky top-4 z-10">
+            <input type="search" id="searchInput" placeholder="Buscar por nombre comercial o principio activo..." class="w-full p-4 text-lg rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+        </div>
+
+        <!-- Contenedor para las tarjetas de fármacos -->
+        <div id="farmacosContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Las tarjetas se insertarán aquí dinámicamente -->
+        </div>
+        
+        <div id="noResults" class="text-center py-16 hidden">
+            <p class="text-xl text-gray-400">No se encontraron fármacos que coincidan con la búsqueda.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- BASE DE DATOS DE FÁRMACOS (ACTUALIZADA A DILUCIONES DE 50CC) ---
+        const farmacos = [
+            {
+                nombreComercial: "ADRENALINA",
+                principioActivo: "ADRENALINA",
+                presentacion: "1 amp = 1 mL = 1 mg",
+                bolo: "Según guías (ej. PCR)",
+                perfusion: "2-20 µg/min",
+                dilucion: "5 amps (5mg) en 50 mL de SG 5% ó SS 0,9%",
+                concentracion: "1 mL = 0,1 mg = 100 µg",
+                ritmoDosis: "1.2 - 12 ml/h",
+                observaciones: "Diluyente: SS 0,9% o SG 5%"
+            },
+            {
+                nombreComercial: "ANEXATE",
+                principioActivo: "FLUMAZENILO",
+                presentacion: "1 amp 10 mL = 1 mg",
+                bolo: "N/A",
+                perfusion: "0,2 - 0,4 mg/h",
+                dilucion: "1 amp (1 mg) en 50 cc de SS 0,9% o SG 5%",
+                concentracion: "1 mL = 0,02 mg",
+                ritmoDosis: "10 - 20 mL/h",
+                observaciones: "Diluyente: SS 0,9% o SG 5%"
+            },
+            {
+                nombreComercial: "DEPAKINE",
+                principioActivo: "VALPROATO SÓDICO",
+                presentacion: "1 vial polvo: 400 mg",
+                bolo: "20-25 mg/Kg en 50–100 mL en 30 min.",
+                perfusion: "1-2 mg/Kg/h",
+                dilucion: "1 vial (400mg) en 50 ml de SS 0,9% o SG 5%",
+                concentracion: "1 mL = 8 mg",
+                ritmoDosis: "Para 70kg: 8,7 - 17,5 mL/h",
+                observaciones: "Diluyente: SS 0,9% o SG 5%"
+            },
+            {
+                nombreComercial: "DIPRIVAN 1%",
+                principioActivo: "PROPOFOL",
+                presentacion: "20 mL = 200 mg",
+                bolo: "Sedación: 0,5-1 mg/kg. Intubación: 2-2,5 mg/kg",
+                perfusion: "1-4 mg/Kg/h",
+                dilucion: "Puro (no diluir)",
+                concentracion: "1 mL = 10 mg",
+                ritmoDosis: "Para 70 Kg: 7-28 mL/h",
+                observaciones: "No Administrar con Fentanilo."
+            },
+            {
+                nombreComercial: "DIPRIVAN 2%",
+                principioActivo: "PROPOFOL",
+                presentacion: "1 amp 20 mL = 400 mg",
+                bolo: "Sedación: 0,5-1 mg/kg. Intubación: 2-2,5 mg/kg",
+                perfusion: "1-4 mg/Kg/h",
+                dilucion: "Puro (no diluir)",
+                concentracion: "1 mL = 20 mg",
+                ritmoDosis: "Para 70 Kg: 3,5-14 mL/h",
+                observaciones: "No Administrar con Fentanilo."
+            },
+            {
+                nombreComercial: "DOBUTREX",
+                principioActivo: "DOBUTAMINA",
+                presentacion: "1 amp = 20 mL = 250 mg",
+                bolo: "N/A",
+                perfusion: "2-20 µg/Kg/min",
+                dilucion: "1 amp (250mg) en 50 mL de SG 5%",
+                concentracion: "1 mL = 5 mg = 5000 µg",
+                ritmoDosis: "Para 70kg: 1,7 - 16,8 mL/h.",
+                observaciones: "Diluyente: SG 5%"
+            },
+            {
+                nombreComercial: "DOPAMINA",
+                principioActivo: "DOPAMINA",
+                presentacion: "1 amp = 5 mL = 200 mg",
+                bolo: "N/A",
+                perfusion: "1-20 µg/Kg/min",
+                dilucion: "2 amps (400mg) en 50 mL de SG 5%",
+                concentracion: "1 mL = 8 mg = 8000 µg",
+                ritmoDosis: "Para 70kg: 0,5 - 10,5 mL/h.",
+                observaciones: "Diluyente: SG 5%"
+            },
+            {
+                nombreComercial: "DORMICUM",
+                principioActivo: "MIDAZOLAM",
+                presentacion: "1 amp = 5mL=5mg | 1 amp = 3mL=15mg",
+                bolo: "Sedación: 0,03-0,1 mg/Kg. Intubación: 0,1-0,4 mg/Kg",
+                perfusion: "0,1 - 0,3 mg/Kg/h",
+                dilucion: "3 amp de 15mg (45mg) en 50 mL de SS 0,9%",
+                concentracion: "1 mL ≈ 1 mg (0,9mg)",
+                ritmoDosis: "Para 70 Kg: 7-21 mL/h",
+                observaciones: ""
+            },
+            {
+                nombreComercial: "ELGADIL",
+                principioActivo: "URAPIDILO",
+                presentacion: "1 amp = 50 mg = 10 mL",
+                bolo: "Inicial: 25 mg en 20 seg. Repetir bolos si no hay respuesta.",
+                perfusion: "9 - 30 mg/h",
+                dilucion: "1 amp (50mg) en 50 ml de SS 0,9% o SG 5%",
+                concentracion: "1 mL = 1mg",
+                ritmoDosis: "9 - 30 ml/h",
+                observaciones: "Contraindicado en Estenosis Aórtica."
+            },
+            {
+                nombreComercial: "ESEMERÓN",
+                principioActivo: "ROCURONIO",
+                presentacion: "1 amp = 50 Mg = 5mL",
+                bolo: "0,5 - 1 mg/Kg",
+                perfusion: "0,3 - 0,6 mg/Kg/h",
+                dilucion: "1 amp (50mg) en 50 ml de SS 0,9%",
+                concentracion: "1 mL = 1 mg",
+                ritmoDosis: "Para 70 Kg: 21 - 42 mL/h",
+                observaciones: ""
+            },
+            {
+                nombreComercial: "FENITOINA",
+                principioActivo: "FENITOINA",
+                presentacion: "1 vial polvo = 250 mg",
+                bolo: "15 mg/Kg",
+                perfusion: "5-6 mg/Kg/día",
+                dilucion: "1 vial (250mg) en 50 ml de SS 0,9%",
+                concentracion: "1 mL = 5 mg",
+                ritmoDosis: "Para 70 Kg: 2,9 - 3,7 ml/h",
+                observaciones: "Diluyente exclusivo SS 0,9%"
+            },
+            {
+                nombreComercial: "FENTANEST",
+                principioActivo: "FENTANILO",
+                presentacion: "1 amp = 0,15 mg = 150 µg",
+                bolo: "1-3 µg/kg",
+                perfusion: "1-2 µg/Kg/h",
+                dilucion: "3 amps (450µg) en 50 ml de SS 0,9%",
+                concentracion: "1 mL = 9 µg",
+                ritmoDosis: "Para 70 Kg: 7,7 - 15,5 mL/h",
+                observaciones: "Dilución ajustada para dosis comunes."
+            },
+            {
+                nombreComercial: "HEPARINA SÓDICA",
+                principioActivo: "HEPARINA SÓDICA",
+                presentacion: "1 vial = 5 ml = 25000 UI",
+                bolo: "Según guías (ej. TEP, IAM)",
+                perfusion: "Según control de APTT",
+                dilucion: "1 vial (25000 UI) en 50 ml de SS 0,9%",
+                concentracion: "1 ml = 500 UI",
+                ritmoDosis: "Iniciar a 2 ml/h (1000 UI/h) y modificar según controles.",
+                observaciones: "Diluyente: SS 0,9%"
+            },
+            {
+                nombreComercial: "INSULINA ACTRAPID",
+                principioActivo: "INSULINA RÁPIDA",
+                presentacion: "Vial 100 UI/ml",
+                bolo: "Según glucemia y pauta",
+                perfusion: "Según pauta móvil",
+                dilucion: "50 UI en 50 ml de SS 0,9% ",
+                concentracion: "1 mL = 1 UI",
+                ritmoDosis: "Iniciar a 1-6 ml/h y modificar según pauta médica móvil.",
+                observaciones: "Diluyente: SS 0,9%"
+            },
+            {
+                nombreComercial: "ISOPRENALINA (ALEUDRINA)",
+                principioActivo: "ISOPROTERENOL",
+                presentacion: "1 amp = 1 mL = 0,2 mg (200 µg)",
+                bolo: "N/A",
+                perfusion: "2-10 µg/min",
+                dilucion: "1 amp (200µg) en 50 mL de SG 5%",
+                concentracion: "1 mL = 4 µg",
+                ritmoDosis: "30 - 150 mL/h",
+                observaciones: "Diluyente: SG 5%"
+            },
+            {
+                nombreComercial: "LOSEC / NEXIUM",
+                principioActivo: "OMEPRAZOL / ESOMEPRAZOL",
+                presentacion: "1 vial polvo = 40 mg",
+                bolo: "40-80 mg IV",
+                perfusion: "8 mg/h (para HDA)",
+                dilucion: "3 viales (120mg) en 50 mL de SS 0,9 %",
+                concentracion: "1 mL = 2,4 mg",
+                ritmoDosis: "3.3 mL/h",
+                observaciones: "Diluyente: SS 0,9%"
+            },
+            {
+                nombreComercial: "MIOFLEX / ANECTINE",
+                principioActivo: "SUCCINILCOLINA",
+                presentacion: "1 amp = 2 mL = 100mg",
+                bolo: "1 - 1,5 mg/Kg",
+                perfusion: "N/A",
+                dilucion: "N/A",
+                concentracion: "N/A",
+                ritmoDosis: "N/A",
+                observaciones: "Relajante muscular despolarizante. No es para perfusión."
+            },
+            {
+                nombreComercial: "MORFINA",
+                principioActivo: "CLORURO MORFICO",
+                presentacion: "1 ml = 10 mg",
+                bolo: "3 mg/min hasta un máximo de 25 mg.",
+                perfusion: "1 - 4 mg/h",
+                dilucion: "1 amp (10mg) en 50 ml de SS 0,9%",
+                concentracion: "1 mL = 0,2 mg",
+                ritmoDosis: "5-20 ml/h",
+                observaciones: "La dosis en bolo puede repetirse cada 15 min."
+            },
+            {
+                nombreComercial: "NALOXONE",
+                principioActivo: "NALOXONA",
+                presentacion: "1 amp = 0,4 mg",
+                bolo: "Según guías",
+                perfusion: "5 - 15 µg/Kg/h",
+                dilucion: "10 amps (4mg) en 50 ml de SG 5%",
+                concentracion: "1 ml = 0,08 mg = 80 µg",
+                ritmoDosis: "Para 70 Kg: 4,4 - 13,2 mL/h",
+                observaciones: "Diluyente: SG 5%"
+            },
+            {
+                nombreComercial: "NIMBEX",
+                principioActivo: "CISATRACURIO",
+                presentacion: "1 amp = 10ml=20mg | 5ml=10mg | 2.5ml=5mg",
+                bolo: "0,15 mg/Kg",
+                perfusion: "1 - 2 µg/Kg/min",
+                dilucion: "1 amp de 20mg en 50 mL de SS 0,9%",
+                concentracion: "1 mL = 0,4 mg = 400 µg",
+                ritmoDosis: "Para 70kg: 10.5 - 21 mL/h",
+                observaciones: "Cálculo ajustado a concentración."
+            },
+            {
+                nombreComercial: "NITROPUSIATO DE SODIO",
+                principioActivo: "NITROPUSIATO",
+                presentacion: "1 amp = 5 mL = 50 mg",
+                bolo: "N/A",
+                perfusion: "0,25 - 10 µg/Kg/min",
+                dilucion: "1 amp (50mg) en 50 mL de SG 5%",
+                concentracion: "1 mL = 1 mg = 1000 µg",
+                ritmoDosis: "Para 70kg: 1 - 42 mL/h",
+                observaciones: "Fotosensible. Proteger de la luz. Diluyente: SG 5%"
+            },
+            {
+                nombreComercial: "NORADRENALINA",
+                principioActivo: "NORADRENALINA",
+                presentacion: "1 amp = 1 ml = 1 mg",
+                bolo: "N/A",
+                perfusion: "2-20 µg/min",
+                dilucion: "5 amps (5mg) en 50 mL de SG 5% ó SS 0,9%",
+                concentracion: "1 ml = 0,1 mg = 100 µg",
+                ritmoDosis: "1.2 - 12 ml/h",
+                observaciones: "Diluyente: SS 0,9% o SG 5%"
+            },
+            {
+                nombreComercial: "NORCURÓN",
+                principioActivo: "VECURONIO",
+                presentacion: "1 amp = 10 mg (polvo)",
+                bolo: "0,1 mg/kg",
+                perfusion: "0,06 - 0,12 mg/Kg/h",
+                dilucion: "5 amps (50mg) en 50 ml de SS 0,9 %",
+                concentracion: "1 mL = 1 mg",
+                ritmoDosis: "Para 70 Kg: 4,2 - 8,4 mL/h",
+                observaciones: ""
+            },
+            {
+                nombreComercial: "SOLINITRINA",
+                principioActivo: "NITROGLICERINA",
+                presentacion: "1 amp = 5ml=5mg | 1 amp = 10ml=50mg",
+                bolo: "N/A",
+                perfusion: "10 - 200 µg/min",
+                dilucion: "1 amp de 50mg en 50 mL de SG 5%",
+                concentracion: "1 mL = 1 mg = 1000 µg",
+                ritmoDosis: "0.6 - 12 mL/h",
+                observaciones: "Dilución con ampolla de 50mg para dosis comunes. Diluyente: SG 5%"
+            },
+            {
+                nombreComercial: "TRACURIO",
+                principioActivo: "ATRACURIO, BESILATO",
+                presentacion: "1 amp = 50 mg",
+                bolo: "0,3 - 0,6 mg/Kg",
+                perfusion: "0,3 - 0,6 mg/Kg/h",
+                dilucion: "1 amp (50mg) en 50 mL de SS 0,9 %",
+                concentracion: "1 mL = 1 mg",
+                ritmoDosis: "Para 70 Kg: 21 - 42 mL/h",
+                observaciones: ""
+            },
+            {
+                nombreComercial: "TRANDATE",
+                principioActivo: "LABETOLOL",
+                presentacion: "1 amp = 20 mL = 100 mg",
+                bolo: "Inicial: 5-10 mg (1-2 mL) en 10 min. Repetir dosis crecientes.",
+                perfusion: "0,5 - 2 mg/min",
+                dilucion: "1 amp (100mg) en 50 mL de SG 5%",
+                concentracion: "1 mL = 2 mg",
+                ritmoDosis: "15 - 60 mL/h",
+                observaciones: "Contraindicado en EAP. Diluyente: SG 5%"
+            },
+            {
+                nombreComercial: "TRANGOREX",
+                principioActivo: "AMIODARONA",
+                presentacion: "1 amp = 3 mL = 150 mg",
+                bolo: "Dosis carga: 2 amp (300mg) en 100 ml SG5% en 20-30 min.",
+                perfusion: "Mantenimiento: 0.5 mg/min",
+                dilucion: "Perf: 2 amps (300mg) en 50 ml SG 5%",
+                concentracion: "Perf: 1 mL = 6 mg",
+                ritmoDosis: "Perf: 5 ml/h",
+                observaciones: "Contraindicado en Hipersensibilidad al Yodo. Diluyente: SG 5%"
+            }
+        ];
+
+        // --- LÓGICA DE LA APLICACIÓN ---
+        const container = document.getElementById('farmacosContainer');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
+
+        const renderFarmacos = (farmacosAMostrar, searchTerm = '') => {
+            container.innerHTML = ''; 
+            
+            if (farmacosAMostrar.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            const highlight = (text) => {
+                if (!searchTerm || !text) return text;
+                const regex = new RegExp(`(${searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+                return text.replace(regex, '<span class="highlight">$1</span>');
+            };
+
+            farmacosAMostrar.forEach(farmaco => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h2 class="card-title">${highlight(farmaco.nombreComercial)}</h2>
+                        <h3 class="card-subtitle">${highlight(farmaco.principioActivo)}</h3>
+                    </div>
+                    <div class="card-content">
+                        ${farmaco.presentacion ? `<div class="info-item"><span class="info-label">Presentación</span><span class="info-value">${farmaco.presentacion}</span></div>` : ''}
+                        ${farmaco.bolo ? `<div class="info-item"><span class="info-label">Bolo</span><span class="info-value">${farmaco.bolo}</span></div>` : ''}
+                        ${farmaco.perfusion ? `<div class="info-item"><span class="info-label">Perfusión</span><span class="info-value">${farmaco.perfusion}</span></div>` : ''}
+                        ${farmaco.dilucion ? `<div class="info-item"><span class="info-label">Dilución (50cc)</span><span class="info-value">${farmaco.dilucion}</span></div>` : ''}
+                        ${farmaco.concentracion ? `<div class="info-item"><span class="info-label">Concentración</span><span class="info-value">${farmaco.concentracion}</span></div>` : ''}
+                        ${farmaco.ritmoDosis ? `<div class="info-item"><span class="info-label">Ritmo/Dosis</span><span class="info-value">${farmaco.ritmoDosis}</span></div>` : ''}
+                        ${farmaco.observaciones ? `<div class="info-item"><span class="info-label">Observaciones</span><span class="info-value">${farmaco.observaciones}</span></div>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const farmacosFiltrados = farmacos.filter(farmaco => 
+                farmaco.nombreComercial.toLowerCase().includes(searchTerm) ||
+                farmaco.principioActivo.toLowerCase().includes(searchTerm)
+            );
+            renderFarmacos(farmacosFiltrados, searchTerm);
+        });
+
+        window.onload = () => {
+            farmacos.sort((a, b) => a.nombreComercial.localeCompare(b.nombreComercial));
+            renderFarmacos(farmacos);
+        };
+
+        // --- REGISTRO DEL SERVICE WORKER PARA PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js').then(registration => {
+                    console.log('ServiceWorker registrado con éxito: ', registration.scope);
+                }, err => {
+                    console.log('Fallo en el registro del ServiceWorker: ', err);
+                });
+            });
+        }
+
+    </script>
+</body>
+</html>

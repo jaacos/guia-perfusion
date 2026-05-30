@@ -1251,6 +1251,7 @@ if('serviceWorker' in navigator){
 
 <script>
 // ── CHAT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
 const chatBtn     = document.getElementById('chatBtn');
 const chatPanel   = document.getElementById('chatPanel');
 const chatClose   = document.getElementById('chatClose');
@@ -1363,6 +1364,7 @@ async function sendMessage() {
         appendMsg('assistant', '⚠ Sin conexión con el servidor.');
     }
 }
+}); // DOMContentLoaded
 </script>
 </body>
 </html>

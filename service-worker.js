@@ -1,6 +1,6 @@
 // service-worker.js
 
-const CACHE_NAME = 'guia-perfusion-cache-v1';
+const CACHE_NAME = 'guia-perfusion-cache-v2';
 // Lista de archivos que se guardarán en la caché para el funcionamiento offline.
 const urlsToCache = [
   './', // El archivo index.html

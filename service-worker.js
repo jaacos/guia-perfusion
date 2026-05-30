@@ -1,4 +1,4 @@
-const CACHE_NAME = 'guia-perfusion-cache-v6';
+const CACHE_NAME = 'guia-perfusion-cache-v7';
 
 const urlsToCache = [
   './',

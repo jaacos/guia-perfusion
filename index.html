@@ -109,6 +109,10 @@
         .calc-result-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.25rem;}
         .calc-result-value{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:600;color:var(--green);}
         .calc-result-detail{font-size:0.72rem;color:var(--text-muted);margin-top:2px;}
+        /* SELECTOR MODO CALC DUAL */
+        .calc-mode-wrap{display:flex;gap:0.4rem;margin-bottom:0.85rem;}
+        .calc-mode-btn{flex:1;padding:0.4rem 0;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:0.68rem;cursor:pointer;transition:all 0.15s;text-align:center;}
+        .calc-mode-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);}
         /* CALCULADORA BOLO */
         .calc-bolo-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:1.2rem;}
         .calc-bolo-title{font-family:'JetBrains Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:#fb923c;margin-bottom:0.75rem;}
@@ -437,18 +441,15 @@ const farmacos = [
         categoria:'vasoactivo',
         presentacion:'1 amp = 10 mL = 10 mg (1 mg/mL)',
         bolo:'No indicado',
-        perfusion:'0,01–0,6 µg/kg/min',
+        perfusion:'2–20 µg/min (fija)  |  0,01–0,6 µg/kg/min (por peso)',
         dilucion:'1 amp (10 mg) en 50 mL SG5% o SS0,9%',
         concentracion:'1 mL = 0,2 mg = 200 µg',
-        ritmo70:'0,13–7,56 mL/h',
+        ritmo70:'0,6–6 mL/h (2–20 µg/min)',
         observaciones:'Diluyente: SS0,9% o SG5%',
         alertas:['viacentral'],
         contraindicaciones:null,
         incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=200;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.01*kg*60)/c,maxMLh:(0.6*kg*60)/c,nota:'0,01–0,6 µg/kg/min'};
-        }
+        calcPerfusion:(kg)=>({_dual:true, kg, c:200}),
     },
     {
         id:'dopamina', nombreComercial:'DOPAMINA', principioActivo:'Dopamina',
@@ -619,15 +620,17 @@ const farmacos = [
         categoria:'antihipertensivo',
         presentacion:'1 amp = 10 mL = 50 mg (5 mg/mL)',
         bolo:'1º: 25 mg en 20 s. 2º: 25 mg a los 5 min si no respuesta. 3º: 50 mg a los 5 min.',
-        perfusion:null,
-        dilucion:'Solo bolo — puro sin diluir (5 mg/mL)',
-        concentracion:'5 mg/mL — administrar puro',
-        ritmo70:'N/A',
-        observaciones:'No requiere dilución. Administrar lento IV directo. Vigilar hipotensión.',
+        perfusion:'9–30 mg/h',
+        dilucion:'1 amp (50 mg) en 50 mL SS0,9% o SG5%',
+        concentracion:'1 mL = 1 mg',
+        ritmo70:'9–30 mL/h',
+        observaciones:'Bolo puro sin diluir (5 mg/mL). Perfusión: diluir 1 amp en 50 mL. Vigilar hipotensión. CI: estenosis aórtica.',
         alertas:[],
         contraindicaciones:'Estenosis aórtica',
         incompatibilidades:null,
-        calcPerfusion:null,
+        calcPerfusion:(kg)=>{
+            return {label:'Perfusión (dosis fija)',minMLh:9,maxMLh:30,nota:'9–30 mg/h = 9–30 mL/h'};
+        },
         calcBolo:(kg)=>[
             {label:'1º bolo (fijo)',mg:25,conc:5,fixed:true},
             {label:'2º bolo si no respuesta (fijo)',mg:25,conc:5,fixed:true},
@@ -972,6 +975,7 @@ function openModal(f) {
 
     const hasCalc = typeof f.calcPerfusion==='function';
     const hasCalcBolo = typeof f.calcBolo==='function';
+    const isDual = hasCalc && f.calcPerfusion(70)?._dual === true;
 
     document.getElementById('modalContent').innerHTML=`
         <div class="modal-name">${f.nombreComercial}</div>
@@ -1004,14 +1008,22 @@ function openModal(f) {
         </div>`:''}
         ${hasCalc?`
         <div class="calc-box">
-            <div class="calc-title">⊕ Calculadora por peso del paciente</div>
-            <div class="calc-input-row">
+            <div class="calc-title">⊕ Calculadora de perfusión</div>
+            ${isDual?`
+            <div class="calc-mode-wrap">
+                <button class="calc-mode-btn active" id="modeFixed">µg/min (fija)</button>
+                <button class="calc-mode-btn" id="modeWeight">µg/kg/min (por peso)</button>
+            </div>`:''}
+            <div class="calc-input-row" id="kgRow" style="${isDual?'display:none':''}">
                 <label>Peso (kg)</label>
                 <input type="number" class="kg-input" id="kgInput" value="70" min="10" max="200" step="1">
             </div>
-            <div class="kg-presets">
+            ${isDual?'':`<div class="kg-presets">
                 ${[40,50,60,70,80,90,100,110,120].map(k=>`<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
-            </div>
+            </div>`}
+            <div id="kgPresetsWrap" style="display:none"><div class="kg-presets">
+                ${[40,50,60,70,80,90,100,110,120].map(k=>`<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
+            </div></div>
             <div class="calc-result" id="calcResult"></div>
         </div>`:''}
     `;
@@ -1032,18 +1044,49 @@ function openModal(f) {
     }
 
     if (hasCalc) {
-        updateCalc(70);
-        document.getElementById('kgInput').addEventListener('input', e=>{
-            const v=parseInt(e.target.value);
-            if(v>=10&&v<=200){updateCalc(v);updateActive(v);}
-        });
-        document.querySelectorAll('.kg-preset').forEach(btn=>{
-            btn.addEventListener('click',()=>{
-                const kg=parseInt(btn.dataset.kg);
-                document.getElementById('kgInput').value=kg;
-                updateCalc(kg); updateActive(kg);
+        if (isDual) {
+            // modo fija por defecto
+            updateCalcDual('fixed', 70);
+            document.getElementById('modeFixed').addEventListener('click', ()=>{
+                document.getElementById('modeFixed').classList.add('active');
+                document.getElementById('modeWeight').classList.remove('active');
+                document.getElementById('kgRow').style.display='none';
+                document.getElementById('kgPresetsWrap').style.display='none';
+                updateCalcDual('fixed', parseInt(document.getElementById('kgInput').value)||70);
             });
-        });
+            document.getElementById('modeWeight').addEventListener('click', ()=>{
+                document.getElementById('modeWeight').classList.add('active');
+                document.getElementById('modeFixed').classList.remove('active');
+                document.getElementById('kgRow').style.display='flex';
+                document.getElementById('kgPresetsWrap').style.display='block';
+                updateCalcDual('weight', parseInt(document.getElementById('kgInput').value)||70);
+            });
+            document.getElementById('kgInput').addEventListener('input', e=>{
+                const v=parseInt(e.target.value);
+                if(v>=10&&v<=200) updateCalcDual('weight', v);
+            });
+            document.querySelectorAll('#kgPresetsWrap .kg-preset').forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    const kg=parseInt(btn.dataset.kg);
+                    document.getElementById('kgInput').value=kg;
+                    updateCalcDual('weight', kg);
+                    document.querySelectorAll('#kgPresetsWrap .kg-preset').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.kg)===kg));
+                });
+            });
+        } else {
+            updateCalc(70);
+            document.getElementById('kgInput').addEventListener('input', e=>{
+                const v=parseInt(e.target.value);
+                if(v>=10&&v<=200){updateCalc(v);updateActive(v);}
+            });
+            document.querySelectorAll('.kg-preset').forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    const kg=parseInt(btn.dataset.kg);
+                    document.getElementById('kgInput').value=kg;
+                    updateCalc(kg); updateActive(kg);
+                });
+            });
+        }
     }
 
     document.getElementById('modalBackdrop').classList.add('open');
@@ -1072,6 +1115,31 @@ function updateCalcBolo(kg){
 
 function updateActive(kg){
     document.querySelectorAll('.kg-preset').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.kg)===kg));
+}
+
+function updateCalcDual(mode, kg){
+    const f = currentFarmaco;
+    if(!f) return;
+    const el = document.getElementById('calcResult'); if(!el) return;
+    const c = f.calcPerfusion(kg).c; // concentración µg/mL
+    if(mode==='fixed'){
+        // dosis fija µg/min
+        const minMcgMin=2, maxMcgMin=20;
+        const minMLh=(minMcgMin*60)/c;
+        const maxMLh=(maxMcgMin*60)/c;
+        el.innerHTML=`
+            <div class="calc-result-label">Perfusión dosis fija</div>
+            <div class="calc-result-value">${minMLh.toFixed(2)} – ${maxMLh.toFixed(2)} mL/h</div>
+            <div class="calc-result-detail">2–20 µg/min · concentración ${c} µg/mL</div>`;
+    } else {
+        // dosis por peso µg/kg/min
+        const minMLh=(0.01*kg*60)/c;
+        const maxMLh=(0.6*kg*60)/c;
+        el.innerHTML=`
+            <div class="calc-result-label">Ritmo para ${kg} kg</div>
+            <div class="calc-result-value">${minMLh.toFixed(2)} – ${maxMLh.toFixed(2)} mL/h</div>
+            <div class="calc-result-detail">0,01–0,6 µg/kg/min · concentración ${c} µg/mL</div>`;
+    }
 }
 
 function updateCalc(kg){

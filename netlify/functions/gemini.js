@@ -38,7 +38,7 @@ FÁRMACOS DISPONIBLES EN LA APP (diluciones a 50 mL):
 - Nitroglicerina: 1 amp (50mg) en 50mL SG5% → 1mg/mL | 5–200µg/min
 - Labetalol: 1 amp (100mg) en 50mL → 2mg/mL | 0,5–2mg/min
 - Nitroprusiato: 1 amp (50mg) en 50mL SG5% → 1mg/mL | 0,5–10µg/kg/min (FOTOSENSIBLE)
-- Urapidilo: bolo escalonado 25/25/50mg + perfusión 1 amp (50mg) en 50mL → 1mg/mL | 9–30mg/h
+- Urapidilo: bolo 25/25/50mg + perfusión 1 amp (50mg) en 50mL → 1mg/mL | 9–30mg/h
 - Fenitoína: 1 vial (250mg) en 50mL SS0,9% → 5mg/mL | vel.máx 50mg/min
 - Valproato: 1 vial (400mg) en 50mL → 8mg/mL | 1–2mg/kg/h
 - Heparina: 1 vial (25.000UI) en 50mL → 500UI/mL | según APTT
@@ -53,17 +53,19 @@ FORMATO DE RESPUESTA:
 - Respuesta directa sin preámbulos
 - Si hay cálculo de dosis, muéstralo paso a paso
 - Si hay contraindicación importante, destacarla al inicio
-- Máximo 4–5 líneas salvo que la complejidad lo requiera
+- Máximo 4-5 líneas salvo que la complejidad lo requiera
 - Sin disclaimers del tipo "consulta con un médico"`;
 
-exports.handler = async (event) => {
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
+
+exports.handler = async function(event) {
     if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
+        return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        return { statusCode: 500, body: JSON.stringify({ error: 'API key no configurada' }) };
+        return { statusCode: 503, body: JSON.stringify({ error: 'API key no configurada' }) };
     }
 
     let body;
@@ -78,43 +80,49 @@ exports.handler = async (event) => {
         return { statusCode: 400, body: JSON.stringify({ error: 'messages requerido' }) };
     }
 
-    // Construir historial para Gemini (roles: user / model)
     const contents = messages.map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: m.content }]
     }));
 
     const payload = {
-        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
         contents,
         generationConfig: {
             temperature: 0.3,
             maxOutputTokens: 1024,
+        },
+        systemInstruction: {
+            parts: [{ text: SYSTEM_PROMPT }]
         }
     };
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-        const res = await fetch(url, {
+        const fetch = await import('node-fetch').catch(() => null);
+        const fetchFn = fetch ? fetch.default : globalThis.fetch;
+
+        const res = await fetchFn(GEMINI_URL + apiKey, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
         if (!res.ok) {
-            const errText = await res.text();
-            return { statusCode: res.status, body: JSON.stringify({ error: errText }) };
+            const errBody = await res.text();
+            console.error('[gemini] error:', res.status, errBody);
+            return { statusCode: 502, body: JSON.stringify({ error: errBody }) };
         }
 
         const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sin respuesta';
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sin respuesta';
 
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reply: text })
+            body: JSON.stringify({ reply })
         };
+
     } catch (err) {
+        console.error('[gemini] catch:', err);
         return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
     }
 };

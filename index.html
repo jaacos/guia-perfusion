@@ -109,6 +109,38 @@
         .calc-result-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.25rem;}
         .calc-result-value{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:600;color:var(--green);}
         .calc-result-detail{font-size:0.72rem;color:var(--text-muted);margin-top:2px;}
+        /* ── CHAT ── */
+        #chatBtn{position:fixed;bottom:1.5rem;right:1.5rem;z-index:300;width:52px;height:52px;border-radius:50%;background:#e53935;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(229,57,53,0.4);transition:transform 0.18s,box-shadow 0.18s;}
+        #chatBtn:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(229,57,53,0.55);}
+        #chatBtn svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+        #chatPanel{position:fixed;bottom:0;right:0;z-index:299;width:100%;max-width:420px;height:88vh;background:var(--bg1);border-left:1px solid var(--border-hover);border-top:1px solid var(--border-hover);border-radius:14px 0 0 0;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.28s cubic-bezier(0.22,1,0.36,1);box-shadow:-8px 0 40px rgba(0,0,0,0.4);}
+        #chatPanel.open{transform:translateX(0);}
+        @media(min-width:640px){#chatPanel{border-radius:14px 14px 0 0;bottom:0;right:1.5rem;width:400px;height:82vh;}}
+        .chat-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+        .chat-header-title{font-size:0.95rem;font-weight:700;color:var(--text-primary);}
+        .chat-header-title span{color:#e53935;}
+        .chat-header-sub{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--text-muted);margin-top:1px;}
+        #chatClose{background:var(--bg3);border:1px solid var(--border);border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);font-size:1rem;transition:background 0.15s;flex-shrink:0;}
+        #chatClose:hover{background:var(--bg2);color:var(--text-primary);}
+        #chatMessages{flex:1;overflow-y:auto;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:0.75rem;scrollbar-width:thin;scrollbar-color:var(--bg3) transparent;}
+        .chat-msg{max-width:88%;line-height:1.5;font-size:0.82rem;padding:0.6rem 0.9rem;border-radius:12px;word-break:break-word;}
+        .chat-msg.user{align-self:flex-end;background:var(--accent-soft);border:1px solid rgba(59,130,246,0.25);color:var(--text-primary);border-radius:12px 12px 3px 12px;}
+        .chat-msg.assistant{align-self:flex-start;background:var(--bg2);border:1px solid var(--border);color:var(--text-secondary);border-radius:12px 12px 12px 3px;}
+        .chat-msg.assistant strong{color:var(--text-primary);}
+        .chat-msg.typing{color:var(--text-muted);font-style:italic;}
+        .chat-empty{text-align:center;color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:0.7rem;margin:auto;padding:2rem 1rem;line-height:1.8;}
+        .chat-empty span{display:block;font-size:1.5rem;margin-bottom:0.75rem;}
+        .chat-suggestions{display:flex;flex-direction:column;gap:0.4rem;margin-top:1rem;}
+        .chat-suggestion{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.45rem 0.75rem;font-size:0.72rem;color:var(--text-secondary);cursor:pointer;text-align:left;transition:border-color 0.15s,color 0.15s;}
+        .chat-suggestion:hover{border-color:var(--border-hover);color:var(--text-primary);}
+        .chat-input-wrap{padding:0.85rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:0.6rem;align-items:flex-end;flex-shrink:0;}
+        #chatInput{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.6rem 0.85rem;color:var(--text-primary);font-family:'Syne',sans-serif;font-size:0.85rem;resize:none;outline:none;max-height:120px;line-height:1.4;transition:border-color 0.2s;}
+        #chatInput:focus{border-color:var(--accent);}
+        #chatInput::placeholder{color:var(--text-muted);}
+        #chatSend{width:38px;height:38px;border-radius:9px;background:#e53935;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s,transform 0.15s;}
+        #chatSend:hover{background:#c62828;transform:scale(1.05);}
+        #chatSend:disabled{background:var(--bg3);cursor:not-allowed;transform:none;}
+        #chatSend svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
         /* SELECTOR MODO CALC DUAL */
         .calc-mode-wrap{display:flex;gap:0.4rem;margin-bottom:0.85rem;}
         .calc-mode-btn{flex:1;padding:0.4rem 0;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:0.68rem;cursor:pointer;transition:all 0.15s;text-align:center;}
@@ -1180,6 +1212,156 @@ if('serviceWorker' in navigator){
             .then(r=>console.log('SW:',r.scope))
             .catch(e=>console.warn('SW error:',e));
     });
+}
+</script>
+<!-- CHAT BUTTON -->
+<button id="chatBtn" aria-label="Consulta clínica">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+
+<!-- CHAT PANEL -->
+<div id="chatPanel">
+    <div class="chat-header">
+        <div>
+            <div class="chat-header-title">Consulta <span>clínica</span></div>
+            <div class="chat-header-sub">Gemini · perfil sanitario avanzado</div>
+        </div>
+        <button id="chatClose">✕</button>
+    </div>
+    <div id="chatMessages">
+        <div class="chat-empty">
+            <span>💊</span>
+            Consulta cualquier duda clínica,<br>
+            interacción, protocolo o dosis.
+            <div class="chat-suggestions">
+                <button class="chat-suggestion">¿Qué vasoactivo elijo en shock séptico refractario a volumen?</button>
+                <button class="chat-suggestion">¿Son compatibles midazolam y fentanilo en la misma vía?</button>
+                <button class="chat-suggestion">Protocolo ISR: secuencia de fármacos y dosis para 80 kg</button>
+                <button class="chat-suggestion">¿Cuándo contraindico el labetalol en una crisis hipertensiva?</button>
+            </div>
+        </div>
+    </div>
+    <div class="chat-input-wrap">
+        <textarea id="chatInput" placeholder="Escribe tu consulta..." rows="1" maxlength="800"></textarea>
+        <button id="chatSend">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+const chatBtn     = document.getElementById('chatBtn');
+const chatPanel   = document.getElementById('chatPanel');
+const chatClose   = document.getElementById('chatClose');
+const chatMessages= document.getElementById('chatMessages');
+const chatInput   = document.getElementById('chatInput');
+const chatSend    = document.getElementById('chatSend');
+
+let chatHistory = [];
+let chatOpen = false;
+let isTyping = false;
+
+function toggleChat() {
+    chatOpen = !chatOpen;
+    chatPanel.classList.toggle('open', chatOpen);
+    if (chatOpen) chatInput.focus();
+}
+
+chatBtn.addEventListener('click', toggleChat);
+chatClose.addEventListener('click', toggleChat);
+
+// Auto-resize textarea
+chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+});
+
+// Enter para enviar (Shift+Enter = salto de línea)
+chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+chatSend.addEventListener('click', sendMessage);
+
+// Sugerencias
+document.querySelectorAll('.chat-suggestion').forEach(btn => {
+    btn.addEventListener('click', () => {
+        chatInput.value = btn.textContent;
+        sendMessage();
+    });
+});
+
+function appendMsg(role, text) {
+    // Eliminar el estado vacío si existe
+    const empty = chatMessages.querySelector('.chat-empty');
+    if (empty) empty.remove();
+
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+    // Convertir **negrita** básica
+    div.innerHTML = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/
+/g,'<br>');
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return div;
+}
+
+function setTyping(on) {
+    isTyping = on;
+    chatSend.disabled = on;
+    if (on) {
+        const d = document.createElement('div');
+        d.className = 'chat-msg assistant typing';
+        d.id = 'typingIndicator';
+        d.textContent = 'Consultando...';
+        const empty = chatMessages.querySelector('.chat-empty');
+        if (empty) empty.remove();
+        chatMessages.appendChild(d);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    } else {
+        const t = document.getElementById('typingIndicator');
+        if (t) t.remove();
+    }
+}
+
+async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text || isTyping) return;
+
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+
+    appendMsg('user', text);
+    chatHistory.push({ role: 'user', content: text });
+
+    setTyping(true);
+
+    try {
+        const res = await fetch('/.netlify/functions/gemini', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: chatHistory })
+        });
+
+        const data = await res.json();
+        setTyping(false);
+
+        if (!res.ok || data.error) {
+            appendMsg('assistant', '⚠ Error: ' + (data.error || res.status));
+            return;
+        }
+
+        appendMsg('assistant', data.reply);
+        chatHistory.push({ role: 'assistant', content: data.reply });
+
+    } catch (err) {
+        setTyping(false);
+        appendMsg('assistant', '⚠ Sin conexión con el servidor.');
+    }
 }
 </script>
 </body>

@@ -109,6 +109,13 @@
         .calc-result-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.25rem;}
         .calc-result-value{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:600;color:var(--green);}
         .calc-result-detail{font-size:0.72rem;color:var(--text-muted);margin-top:2px;}
+        /* CALCULADORA BOLO */
+        .calc-bolo-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:1.2rem;}
+        .calc-bolo-title{font-family:'JetBrains Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:#fb923c;margin-bottom:0.75rem;}
+        .bolo-result-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:0.65rem 1rem;margin-top:0.5rem;}
+        .bolo-result-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:3px;}
+        .bolo-result-value{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:#fb923c;}
+        .bolo-result-vol{font-size:0.72rem;color:var(--text-muted);margin-top:2px;}
         /* CATEGORÍAS */
         .cat-vasoactivo{background:rgba(239,68,68,0.12);color:#f87171;}
         .cat-sedacion{background:rgba(167,139,250,0.12);color:#a78bfa;}
@@ -286,7 +293,7 @@ const farmacos = [
         perfusion:'Analgesia: 1–2 µg/kg/h  |  Sedación: 3–15 µg/kg/h',
         dilucion:'3 amp (450 µg) en 50 mL SS0,9%',
         concentracion:'1 mL = 9 µg',
-        ritmo70:'7,7–116,7 mL/h (rango completo)',
+        ritmo70:'7,8–116,7 mL/h (rango completo)',
         observaciones:'Diluyente: SS0,9%',
         alertas:[],
         contraindicaciones:null,
@@ -390,17 +397,21 @@ const farmacos = [
     {
         id:'succinilcolina', nombreComercial:'ANECTINE / MIOFLEX', principioActivo:'Succinilcolina',
         categoria:'relajante',
-        presentacion:'1 amp = 2 mL = 100 mg',
+        presentacion:'1 amp = 2 mL = 100 mg (50 mg/mL)',
         bolo:'1–1,5 mg/kg IV. ISR: 1,5 mg/kg',
-        perfusion:'No aplica',
-        dilucion:'No aplica (solo bolo)',
+        perfusion:null,
+        dilucion:'Solo bolo — no perfusión continua',
         concentracion:'50 mg/mL',
         ritmo70:'N/A',
-        observaciones:'Relajante despolarizante. Acción 5–10 min.',
+        observaciones:'Relajante despolarizante. Acción 5–10 min. Sin antídoto (acción corta).',
         alertas:[],
         contraindicaciones:'Hiperpotasemia, quemaduras extensas >48h, miopatías',
         incompatibilidades:null,
-        calcPerfusion:null
+        calcPerfusion:null,
+        calcBolo:(kg)=>[
+            {label:'Dosis estándar (1 mg/kg)',mg:1*kg,conc:50},
+            {label:'Dosis ISR (1,5 mg/kg)',mg:1.5*kg,conc:50},
+        ]
     },
     // ── VASOACTIVOS ───────────────────────────────────────────
     {
@@ -424,18 +435,18 @@ const farmacos = [
     {
         id:'noradrenalina', nombreComercial:'NORADRENALINA', principioActivo:'Noradrenalina',
         categoria:'vasoactivo',
-        presentacion:'1 amp = 1 mL = 1 mg',
+        presentacion:'1 amp = 10 mL = 10 mg (1 mg/mL)',
         bolo:'No indicado',
         perfusion:'0,01–0,6 µg/kg/min',
-        dilucion:'5 amp (5 mg) en 50 mL SG5% o SS0,9%',
-        concentracion:'1 mL = 0,1 mg = 100 µg',
-        ritmo70:'0,25–15,1 mL/h',
+        dilucion:'1 amp (10 mg) en 50 mL SG5% o SS0,9%',
+        concentracion:'1 mL = 0,2 mg = 200 µg',
+        ritmo70:'0,13–7,56 mL/h',
         observaciones:'Diluyente: SS0,9% o SG5%',
         alertas:['viacentral'],
         contraindicaciones:null,
         incompatibilidades:null,
         calcPerfusion:(kg)=>{
-            const c=100;
+            const c=200;
             return {label:'Ritmo para '+kg+' kg',minMLh:(0.01*kg*60)/c,maxMLh:(0.6*kg*60)/c,nota:'0,01–0,6 µg/kg/min'};
         }
     },
@@ -500,15 +511,15 @@ const farmacos = [
         presentacion:'1 amp = 1 mL = 0,2 mg (200 µg)',
         bolo:'No indicado',
         perfusion:'0,01–0,2 µg/kg/min',
-        dilucion:'5 amp (1.000 µg) en 50 mL SG5%',
-        concentracion:'1 mL = 20 µg',
-        ritmo70:'1,3–25,2 mL/h',
-        observaciones:'Diluyente: SG5%',
+        dilucion:'1 amp (200 µg) en 50 mL SG5%',
+        concentracion:'1 mL = 4 µg',
+        ritmo70:'6,3–126 mL/h',
+        observaciones:'Diluyente: SG5%. Para dosis altas considerar concentración mayor.',
         alertas:['viacentral'],
         contraindicaciones:null,
         incompatibilidades:null,
         calcPerfusion:(kg)=>{
-            const c=20;
+            const c=4;
             return {label:'Ritmo para '+kg+' kg',minMLh:(0.01*kg*60)/c,maxMLh:(0.2*kg*60)/c,nota:'0,01–0,2 µg/kg/min'};
         }
     },
@@ -606,17 +617,22 @@ const farmacos = [
     {
         id:'elgadil', nombreComercial:'ELGADIL', principioActivo:'Urapidilo',
         categoria:'antihipertensivo',
-        presentacion:'1 amp = 10 mL = 50 mg',
-        bolo:'25 mg en 20 s. Repetir si no hay respuesta en 5 min.',
-        perfusion:'9–30 mg/h',
-        dilucion:'1 amp (50 mg) en 50 mL SS0,9% o SG5%',
-        concentracion:'1 mL = 1 mg',
-        ritmo70:'9–30 mL/h',
-        observaciones:'Diluyente: SS0,9% o SG5%',
+        presentacion:'1 amp = 10 mL = 50 mg (5 mg/mL)',
+        bolo:'1º: 25 mg en 20 s. 2º: 25 mg a los 5 min si no respuesta. 3º: 50 mg a los 5 min.',
+        perfusion:null,
+        dilucion:'Solo bolo — puro sin diluir (5 mg/mL)',
+        concentracion:'5 mg/mL — administrar puro',
+        ritmo70:'N/A',
+        observaciones:'No requiere dilución. Administrar lento IV directo. Vigilar hipotensión.',
         alertas:[],
         contraindicaciones:'Estenosis aórtica',
         incompatibilidades:null,
-        calcPerfusion:null
+        calcPerfusion:null,
+        calcBolo:(kg)=>[
+            {label:'1º bolo (fijo)',mg:25,conc:5,fixed:true},
+            {label:'2º bolo si no respuesta (fijo)',mg:25,conc:5,fixed:true},
+            {label:'3º bolo si no respuesta (fijo)',mg:50,conc:5,fixed:true},
+        ]
     },
     // ── ANTIARRÍTMICOS ────────────────────────────────────────
     {
@@ -769,8 +785,8 @@ const farmacos = [
         perfusion:'Inicio: 0,5–1 UI/h. Titular según glucemia.',
         dilucion:'50 UI en 50 mL SS0,9%',
         concentracion:'1 mL = 1 UI',
-        ritmo70:'Inicio: 0,5–1 mL/h. Ajustar según pauta.',
-        observaciones:'Diluyente: SS0,9%. La insulina se adsorbe al PVC; purgar 20 mL antes.',
+        ritmo70:'Inicio habitual: 1–6 mL/h (1–6 UI/h). Ajustar según pauta.',
+        observaciones:'Diluyente: SS0,9%. La insulina se adsorbe al PVC; purgar 20 mL antes. Protocolo hospitalario SUC: inicio a 6 UI/h.',
         alertas:[],
         contraindicaciones:null,
         incompatibilidades:null,
@@ -955,6 +971,7 @@ function openModal(f) {
     if (f.incompatibilidades)       pills.push(`<span class="alert-pill alert-inc">≠ INC: ${f.incompatibilidades}</span>`);
 
     const hasCalc = typeof f.calcPerfusion==='function';
+    const hasCalcBolo = typeof f.calcBolo==='function';
 
     document.getElementById('modalContent').innerHTML=`
         <div class="modal-name">${f.nombreComercial}</div>
@@ -973,6 +990,18 @@ function openModal(f) {
             <tr><td>Ritmo ref. (70 kg)</td><td class="val-key">${f.ritmo70}</td></tr>
             ${f.observaciones?`<tr><td>Observaciones</td><td>${f.observaciones}</td></tr>`:''}
         </table>
+        ${hasCalcBolo?`
+        <div class="calc-bolo-box">
+            <div class="calc-bolo-title">⊕ Calculadora de dosis en bolo</div>
+            <div class="calc-input-row">
+                <label>Peso (kg)</label>
+                <input type="number" class="kg-input" id="kgBoloInput" value="70" min="10" max="200" step="1">
+            </div>
+            <div class="kg-presets" id="boloPresets">
+                ${[40,50,60,70,80,90,100,110,120].map(k=>`<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
+            </div>
+            <div id="boloResults"></div>
+        </div>`:''}
         ${hasCalc?`
         <div class="calc-box">
             <div class="calc-title">⊕ Calculadora por peso del paciente</div>
@@ -986,6 +1015,21 @@ function openModal(f) {
             <div class="calc-result" id="calcResult"></div>
         </div>`:''}
     `;
+
+    if (hasCalcBolo) {
+        updateCalcBolo(70);
+        document.getElementById('kgBoloInput').addEventListener('input', e=>{
+            const v=parseInt(e.target.value);
+            if(v>=10&&v<=200){updateCalcBolo(v);updateBoloActive(v);}
+        });
+        document.querySelectorAll('#boloPresets .kg-preset').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+                const kg=parseInt(btn.dataset.kg);
+                document.getElementById('kgBoloInput').value=kg;
+                updateCalcBolo(kg); updateBoloActive(kg);
+            });
+        });
+    }
 
     if (hasCalc) {
         updateCalc(70);
@@ -1004,6 +1048,26 @@ function openModal(f) {
 
     document.getElementById('modalBackdrop').classList.add('open');
     document.body.style.overflow='hidden';
+}
+
+function updateBoloActive(kg){
+    document.querySelectorAll('#boloPresets .kg-preset').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.kg)===kg));
+}
+
+function updateCalcBolo(kg){
+    if(!currentFarmaco||typeof currentFarmaco.calcBolo!=='function') return;
+    const doses=currentFarmaco.calcBolo(kg);
+    const el=document.getElementById('boloResults'); if(!el) return;
+    el.innerHTML=doses.map(d=>{
+        const mg=d.fixed?d.mg:d.mg;
+        const vol=d.conc?(mg/d.conc).toFixed(2)+' mL':'—';
+        const doseLabel=d.fixed?mg.toFixed(0)+' mg (fijo)':mg.toFixed(1)+' mg';
+        return `<div class="bolo-result-row">
+            <div class="bolo-result-label">${d.label}</div>
+            <div class="bolo-result-value">${doseLabel}</div>
+            <div class="bolo-result-vol">Volumen: ${vol} (conc. ${d.conc} mg/mL)</div>
+        </div>`;
+    }).join('');
 }
 
 function updateActive(kg){

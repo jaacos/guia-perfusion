@@ -302,24 +302,7 @@ const farmacos = [
             return {label:'Ritmo para '+kg+' kg',minMLh:(0.1*kg)/c,maxMLh:(1.4*kg)/c,nota:'0,1–1,4 µg/kg/h'};
         }
     },
-    {
-        id:'remifentanilo', nombreComercial:'ULTIVA', principioActivo:'Remifentanilo',
-        categoria:'sedacion',
-        presentacion:'1 vial polvo = 1 mg (reconstituir en 1 mL = 1 mg/mL)',
-        bolo:'No recomendado en bolo (rigidez torácica)',
-        perfusion:'0,5–3 µg/kg/h (sedación analgésica)',
-        dilucion:'2,5 viales (2,5 mg) en 50 mL SS0,9% o SG5%',
-        concentracion:'1 mL = 50 µg',
-        ritmo70:'0,7–4,2 mL/h',
-        observaciones:'Vida media ultraCorta (~3–5 min). Siempre en bomba de jeringa. Diluyente: SS0,9% o SG5%',
-        alertas:['bombaICC'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=50;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.5*kg)/c,maxMLh:(3*kg)/c,nota:'0,5–3 µg/kg/h'};
-        }
-    },
+
     // ── ANALGESIA ─────────────────────────────────────────────
     {
         id:'fentanilo', nombreComercial:'FENTANEST', principioActivo:'Fentanilo',
@@ -863,17 +846,18 @@ const farmacos = [
         categoria:'revertidor',
         presentacion:'1 amp = 10 mL = 1 mg',
         bolo:'0,2 mg IV en 15 s. Repetir c/1 min hasta 1 mg total.',
-        perfusion:'2–10 µg/kg/h',
+        perfusion:'0,1–0,4 mg/h (dosis fija)',
         dilucion:'1 amp (1 mg) en 50 mL SS0,9% o SG5%',
         concentracion:'1 mL = 0,02 mg = 20 µg',
-        ritmo70:'2,45–12,25 mL/h',
-        observaciones:'Vida media corta. Vigilar re-sedación.',
+        ritmo70:'5–20 mL/h',
+        observaciones:'Vida media corta (~1h). Vigilar re-sedación. Dosis fija independiente del peso.',
         alertas:[],
         contraindicaciones:'Dependencia a BZD crónica (precipita abstinencia)',
         incompatibilidades:null,
         calcPerfusion:(kg)=>{
-            const c=20;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(2*kg)/c,maxMLh:(10*kg)/c,nota:'2–10 µg/kg/h'};
+            const c=0.02;
+            const minMLh=0.1/c, maxMLh=0.4/c;
+            return {label:'Perfusión (dosis fija)',minMLh,maxMLh,nota:'0,1–0,4 mg/h'};
         }
     },
     {
@@ -1266,7 +1250,33 @@ let isTyping = false;
 function toggleChat() {
     chatOpen = !chatOpen;
     chatPanel.classList.toggle('open', chatOpen);
-    if (chatOpen) chatInput.focus();
+    if (chatOpen) {
+        chatInput.focus();
+    } else {
+        // Resetear al cerrar
+        chatHistory = [];
+        chatMessages.innerHTML = `
+            <div class="chat-empty">
+                <span>💊</span>
+                Consulta cualquier duda clínica,<br>
+                interacción, protocolo o dosis.
+                <div class="chat-suggestions">
+                    <button class="chat-suggestion">¿Qué vasoactivo elijo en shock séptico refractario a volumen?</button>
+                    <button class="chat-suggestion">¿Son compatibles midazolam y fentanilo en la misma vía?</button>
+                    <button class="chat-suggestion">Protocolo ISR: secuencia de fármacos y dosis para 80 kg</button>
+                    <button class="chat-suggestion">¿Cuándo contraindico el labetalol en una crisis hipertensiva?</button>
+                </div>
+            </div>`;
+        // Reasignar eventos a las nuevas sugerencias
+        document.querySelectorAll('.chat-suggestion').forEach(btn => {
+            btn.addEventListener('click', () => {
+                chatInput.value = btn.textContent;
+                sendMessage();
+            });
+        });
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+    }
 }
 
 chatBtn.addEventListener('click', toggleChat);

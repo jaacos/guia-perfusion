@@ -55,7 +55,7 @@ FORMATO DE RESPUESTA:
 - Máximo 4-5 líneas salvo que la complejidad lo requiera
 - Sin disclaimers del tipo "consulta con un médico"`;
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=`;
 
 exports.handler = async function(event) {
     if (event.httpMethod !== 'POST') {

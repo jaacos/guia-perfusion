@@ -23,7 +23,6 @@ FÁRMACOS DISPONIBLES EN LA APP (diluciones a 50 mL):
 - Midazolam: 3 amp 15mg (45mg) en 50mL → 0,9mg/mL | 0,1–0,3 mg/kg/h
 - Ketamina: 1 vial (500mg) en 50mL → 10mg/mL | 1–3 mg/kg/h sedación, 0,1–0,5 analgesia
 - Dexmedetomidina: 2 viales (400µg) en 50mL → 8µg/mL | 0,1–1,4µg/kg/h
-- Remifentanilo: 2,5 viales (2,5mg) en 50mL → 50µg/mL | 0,5–3µg/kg/h
 - Fentanilo: 3 amp (450µg) en 50mL → 9µg/mL | 1–2µg/kg/h analgesia, 3–15µg/kg/h sedación
 - Morfina: 1 amp (10mg) en 50mL → 0,2mg/mL | 0,8–10mg/h
 - Rocuronio: 1 amp (50mg) en 50mL → 1mg/mL | 0,3–0,9 mg/kg/h
@@ -45,7 +44,7 @@ FÁRMACOS DISPONIBLES EN LA APP (diluciones a 50 mL):
 - Ácido tranexámico: 2 amp (1000mg) en 50mL → 20mg/mL | 1g/8h
 - Insulina: 50UI en 50mL → 1UI/mL | 1–6UI/h
 - Furosemida: 5 amp (100mg) en 50mL → 2mg/mL | 10mg/h titular
-- Flumazenilo: 1 amp (1mg) en 50mL → 20µg/mL | 2–10µg/kg/h
+- Flumazenilo: 1 amp (1mg) en 50mL → 20µg/mL | 0,1–0,4 mg/h (dosis fija)
 - Naloxona: 10 amp (4mg) en 50mL SG5% → 80µg/mL | 2–10µg/kg/h
 - Omeprazol/Esomeprazol: 3 viales (120mg) en 50mL → 2,4mg/mL | 8mg/h
 
@@ -56,7 +55,7 @@ FORMATO DE RESPUESTA:
 - Máximo 4-5 líneas salvo que la complejidad lo requiera
 - Sin disclaimers del tipo "consulta con un médico"`;
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=`;
 
 exports.handler = async function(event) {
     if (event.httpMethod !== 'POST') {

@@ -1,127 +1,196 @@
-const SYSTEM_PROMPT = `Eres un asistente clínico especializado en emergencias y medicina intensiva, integrado en una aplicación de perfusiones del Servicio de Urgencias Canario (SUC).
+// ═══════════════════════════════════════════════════════════════════════════════
+//  Proxy Gemini — Guía Rápida de Perfusión (SUC)
+//  El vademécum NO se duplica aquí: se genera desde farmacos.json (fuente única).
+// ═══════════════════════════════════════════════════════════════════════════════
+const FARMACOS = require('../../farmacos.json');
 
-PERFIL DEL USUARIO: Enfermero o médico de emergencias con formación avanzada. Usa terminología técnica sin explicar conceptos básicos. Respuestas directas, precisas y accionables.
+// ── Config ────────────────────────────────────────────────────────────────────
+const MODELO         = 'gemini-2.5-flash';
+const MAX_TOKENS     = 2048;   // 1024 truncaba protocolos largos (ISR, status)
+const MAX_HISTORIAL  = 10;     // mensajes conservados (5 turnos)
+const MAX_CHARS_MSG  = 1000;
+const VENTANA_MS     = 60000;  // rate limit: ventana de 1 min
+const MAX_PETICIONES = 8;      // ... por IP y ventana
 
-SCOPE: Resuelves cualquier duda clínica relacionada con:
-- Fármacos vasoactivos, sedación, analgesia, relajantes neuromusculares, antiarrítmicos, antiepilépticos, anticoagulantes y cualquier medicación de emergencias
-- Interacciones farmacológicas y compatibilidades IV
-- Diluciones, concentraciones y ritmos de perfusión
-- Protocolos clínicos de emergencias: PCR, shock, intubación, status epiléptico, SCA, TEP, etc.
-- Decisiones terapéuticas en contexto de emergencia prehospitalaria o intrahospitalaria
+const ORIGENES_OK = [
+    'https://guiaperf.netlify.app'
+    // añade aquí tu dominio propio si lo mapeas
+];
 
-FÁRMACOS DISPONIBLES EN LA APP (diluciones a 50 mL):
-- Adrenalina: 5 amp (5mg) en 50mL → 100µg/mL | 0,03–0,2 µg/kg/min
-- Noradrenalina: 1 amp (10mg) en 50mL → 200µg/mL | 2–20µg/min o 0,01–0,6µg/kg/min
-- Dopamina: 2 amp (400mg) en 50mL → 8mg/mL | 2–20µg/kg/min
-- Dobutamina: 1 amp (250mg) en 50mL → 5mg/mL | 2,5–20µg/kg/min
-- Vasopresina: 5 amp (100UI) en 50mL → 2UI/mL | 0,01–0,04 UI/min
-- Isoprenalina: 1 amp (200µg) en 50mL → 4µg/mL | 0,01–0,2µg/kg/min
-- Levosimendán: 1 vial (12,5mg) en 50mL SG5% → 250µg/mL | 0,05–0,2µg/kg/min
-- Milrinona: 2 amp (20mg) en 50mL → 400µg/mL | 0,375–0,75µg/kg/min
-- Propofol 1%: puro | 1–6 mg/kg/h
-- Propofol 2%: puro | 1–6 mg/kg/h
-- Midazolam: 3 amp 15mg (45mg) en 50mL → 0,9mg/mL | 0,1–0,3 mg/kg/h
-- Ketamina: 1 vial (500mg) en 50mL → 10mg/mL | 1–3 mg/kg/h sedación, 0,1–0,5 analgesia
-- Dexmedetomidina: 2 viales (400µg) en 50mL → 8µg/mL | 0,1–1,4µg/kg/h
-- Fentanilo: 3 amp (450µg) en 50mL → 9µg/mL | 1–2µg/kg/h analgesia, 3–15µg/kg/h sedación
-- Morfina: 1 amp (10mg) en 50mL → 0,2mg/mL | 0,8–10mg/h
-- Rocuronio: 1 amp (50mg) en 50mL → 1mg/mL | 0,3–0,9 mg/kg/h
-- Cisatracurio: 1 amp (20mg) en 50mL → 400µg/mL | 1–3µg/kg/min
-- Atracurio: 1 amp (50mg) en 50mL → 1mg/mL | 0,3–0,6 mg/kg/h
-- Vecuronio: 5 amp (50mg) en 50mL → 1mg/mL | 0,8–1,4µg/kg/min
-- Succinilcolina: bolo único 1–1,5 mg/kg
-- Amiodarona: 2 amp (300mg) en 50mL SG5% → 6mg/mL | 0,5mg/min mantenimiento
-- Esmolol: 2 viales (200mg) en 50mL → 4mg/mL | 50–300µg/kg/min
-- Lidocaína: 2 amp (200mg) en 50mL → 4mg/mL | 1–4mg/min
-- Diltiazem: 2 viales (50mg) en 50mL → 1mg/mL | 5–15mg/h
-- Nitroglicerina: 1 amp (50mg) en 50mL SG5% → 1mg/mL | 5–200µg/min
-- Labetalol: 1 amp (100mg) en 50mL → 2mg/mL | 0,5–2mg/min
-- Nitroprusiato: 1 amp (50mg) en 50mL SG5% → 1mg/mL | 0,5–10µg/kg/min (FOTOSENSIBLE)
-- Urapidilo: bolo 25/25/50mg + perfusión 1 amp (50mg) en 50mL → 1mg/mL | 9–30mg/h
-- Fenitoína: 1 vial (250mg) en 50mL SS0,9% → 5mg/mL | vel.máx 50mg/min
-- Valproato: 1 vial (400mg) en 50mL → 8mg/mL | 1–2mg/kg/h
-- Heparina: 1 vial (25.000UI) en 50mL → 500UI/mL | según APTT
-- Ácido tranexámico: 2 amp (1000mg) en 50mL → 20mg/mL | 1g/8h
-- Insulina: 50UI en 50mL → 1UI/mL | 1–6UI/h
-- Furosemida: 5 amp (100mg) en 50mL → 2mg/mL | 10mg/h titular
-- Flumazenilo: 1 amp (1mg) en 50mL → 20µg/mL | 0,1–0,4 mg/h (dosis fija)
-- Naloxona: 10 amp (4mg) en 50mL SG5% → 80µg/mL | 2–10µg/kg/h
-- Omeprazol/Esomeprazol: 3 viales (120mg) en 50mL → 2,4mg/mL | 8mg/h
+// ── Rate limiting en memoria (best-effort; se reinicia con la función fría) ────
+const buckets = new Map();
+function permitido(ip) {
+    const ahora = Date.now();
+    const recientes = (buckets.get(ip) || []).filter(t => ahora - t < VENTANA_MS);
+    if (recientes.length >= MAX_PETICIONES) return false;
+    recientes.push(ahora);
+    buckets.set(ip, recientes);
+    if (buckets.size > 5000) buckets.clear(); // purga defensiva
+    return true;
+}
 
-FORMATO DE RESPUESTA:
-- Respuesta directa sin preámbulos
-- Si hay cálculo de dosis, muéstralo paso a paso
-- Si hay contraindicación importante, destacarla al inicio
-- Máximo 4-5 líneas salvo que la complejidad lo requiera
-- Sin disclaimers del tipo "consulta con un médico"`;
+// ── Motor de conversión (idéntico al de la app) ───────────────────────────────
+const FACTOR = { 'mg': { 'mg': 1, 'µg': 1000 }, 'µg': { 'µg': 1, 'mg': 0.001 }, 'UI': { 'UI': 1 } };
+function mLh(dose, unidad, kg, conc) {
+    const p = unidad.split('/');
+    const t = p[p.length - 1];
+    let porHora = dose * (p.includes('kg') ? kg : 1);
+    if (t === 'min') porHora *= 60;
+    if (t === 'día') porHora /= 24;
+    const f = FACTOR[p[0]] && FACTOR[p[0]][conc.unidad];
+    return f == null ? NaN : (porHora * f) / conc.valor;
+}
+const fmtNum = n => (Number.isFinite(n) ? String(Math.round(n * 100) / 100).replace('.', ',') : '—');
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=`;
+// ── Vademécum derivado de los datos reales de la app ──────────────────────────
+function lineaFarmaco(f) {
+    const dosis = (f.modos || [])
+        .map(m => `${m.nombre} ${fmtNum(m.min)}–${fmtNum(m.max)} ${m.unidad}`)
+        .join(' | ') || 'solo bolo';
+    const ritmo = (f.modos || [])
+        .map(m => `${m.nombre} ${fmtNum(mLh(m.min, m.unidad, 70, f.conc))}–${fmtNum(mLh(m.max, m.unidad, 70, f.conc))} mL/h`)
+        .join(' | ');
+    let s = `- ${f.principioActivo} (${f.nombreComercial}) [${f.categoria}]`;
+    s += `\n  · Preparación: ${f.dilucion}`;
+    s += `\n  · Concentración: ${f.concTexto}`;
+    s += `\n  · Bolo: ${f.bolo || '—'}`;
+    s += `\n  · Perfusión: ${dosis}`;
+    s += `\n  · Ritmo a 70 kg: ${ritmo || '—'}`;
+    if (f.observaciones)      s += `\n  · Nota: ${f.observaciones}`;
+    if (f.contraindicaciones) s += `\n  · CI: ${f.contraindicaciones}`;
+    if (f.incompatibilidades) s += `\n  · Incompatibilidad: ${f.incompatibilidades}`;
+    return s;
+}
 
-exports.handler = async function(event) {
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
-    }
+const VADEMECUM = FARMACOS.map(lineaFarmaco).join('\n');
+
+const SYSTEM_PROMPT = `Eres un asistente clínico de emergencias integrado en la app de perfusiones del Servicio de Urgencias Canario (SUC).
+
+PERFIL DEL USUARIO: enfermero o médico de emergencias con formación avanzada. Terminología técnica, sin explicar conceptos básicos. Respuestas directas y accionables.
+
+═══ REGLA CRÍTICA DE SEGURIDAD ═══
+Para CUALQUIER pregunta sobre dilución, concentración o ritmo de perfusión de un fármaco que figure en el VADEMÉCUM DE LA APP, usa EXCLUSIVAMENTE los datos de abajo. NUNCA inventes ni recuperes de memoria una dilución distinta a la listada.
+Si el fármaco NO está en el vademécum, dilo de forma explícita ("No está en la guía de la app") y solo entonces ofrece la referencia general, marcándola como externa a la app y pendiente de verificar en ficha técnica.
+Si no estás seguro de una cifra, dilo. Es preferible declarar incertidumbre que dar una dosis errónea.
+Todas las diluciones de la app son a VOLUMEN FINAL de 50 mL (fármaco + diluyente = 50 mL), no "añadir a 50 mL".
+
+═══ VADEMÉCUM DE LA APP (volumen final 50 mL) ═══
+${VADEMECUM}
+
+═══ ALCANCE ═══
+Vasoactivos, sedación, analgesia, relajantes neuromusculares, antiarrítmicos, antiepilépticos, anticoagulantes; interacciones y compatibilidades IV; protocolos de emergencia (PCR, shock, ISR/IOT, status epiléptico, SCA, TEP, hemorragia masiva).
+
+═══ FORMATO ═══
+- Sin preámbulos.
+- Si hay cálculo de dosis, muéstralo paso a paso (dosis → mg/h o µg/min → mL/h) citando la concentración usada.
+- Si hay contraindicación o incompatibilidad relevante, destácala al inicio.
+- Máximo 5-6 líneas salvo que la complejidad lo exija.
+- No añadas disclaimers genéricos del tipo "consulta con un médico": el usuario ES el profesional. Sí debes señalar incertidumbre técnica concreta cuando exista.`;
+
+// ── Handler ───────────────────────────────────────────────────────────────────
+exports.handler = async function (event) {
+    if (event.httpMethod !== 'POST') return json(405, { error: 'Método no permitido' });
+
+    // Control de origen: evita que terceros consuman tu cuota de la API
+    const origen = event.headers.origin || event.headers.referer || '';
+    const autorizado = ORIGENES_OK.some(o => origen.startsWith(o));
+    const esPreview  = /--[a-z0-9-]+\.netlify\.app/.test(origen); // deploy previews
+    if (origen && !autorizado && !esPreview) return json(403, { error: 'Origen no autorizado' });
+
+    // Rate limiting por IP
+    const ip = event.headers['x-nf-client-connection-ip']
+            || (event.headers['x-forwarded-for'] || '').split(',')[0].trim()
+            || 'desconocida';
+    if (!permitido(ip)) return json(429, { error: 'Demasiadas consultas. Espera unos segundos.' });
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        return { statusCode: 503, body: JSON.stringify({ error: 'API key no configurada' }) };
+        console.error('[gemini] GEMINI_API_KEY no configurada');
+        return json(503, { error: 'Servicio no disponible' });
     }
 
     let body;
-    try {
-        body = JSON.parse(event.body);
-    } catch {
-        return { statusCode: 400, body: JSON.stringify({ error: 'JSON inválido' }) };
+    try { body = JSON.parse(event.body); }
+    catch { return json(400, { error: 'JSON inválido' }); }
+
+    if (!Array.isArray(body.messages) || body.messages.length === 0) {
+        return json(400, { error: 'Falta el campo messages' });
     }
 
-    const { messages } = body;
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-        return { statusCode: 400, body: JSON.stringify({ error: 'messages requerido' }) };
-    }
+    // Saneado: recorta historial y longitud, descarta entradas malformadas
+    const contents = body.messages
+        .filter(m => m && typeof m.content === 'string' && m.content.trim())
+        .slice(-MAX_HISTORIAL)
+        .map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: m.content.slice(0, MAX_CHARS_MSG) }]
+        }));
 
-    const contents = messages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }]
-    }));
+    if (!contents.length) return json(400, { error: 'Mensajes vacíos' });
 
     const payload = {
         contents,
-        generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1024,
-        },
-        systemInstruction: {
-            parts: [{ text: SYSTEM_PROMPT }]
-        }
+        generationConfig: { temperature: 0.2, maxOutputTokens: MAX_TOKENS },
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
     };
 
     try {
-        const fetch = await import('node-fetch').catch(() => null);
-        const fetchFn = fetch ? fetch.default : globalThis.fetch;
+        // Node 18+ en Netlify: fetch es global, node-fetch era innecesario
+        const ctrl = new AbortController();
+        const timeout = setTimeout(() => ctrl.abort(), 25000);
 
-        const res = await fetchFn(GEMINI_URL + apiKey, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${MODELO}:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: ctrl.signal
+            }
+        );
+        clearTimeout(timeout);
 
         if (!res.ok) {
-            const errBody = await res.text();
-            console.error('[gemini] error:', res.status, errBody);
-            return { statusCode: 502, body: JSON.stringify({ error: errBody }) };
+            // El detalle se registra, NO se devuelve al cliente
+            console.error('[gemini] upstream', res.status, await res.text());
+            return json(502, { error: 'El asistente no está disponible ahora mismo.' });
         }
 
         const data = await res.json();
-        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sin respuesta';
+        const cand = data && data.candidates && data.candidates[0];
+        const partes = (cand && cand.content && cand.content.parts) || [];
+        const texto = partes.map(p => p.text).filter(Boolean).join('');
 
-        return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reply })
-        };
+        if (!texto) {
+            const motivo = (cand && cand.finishReason)
+                || (data.promptFeedback && data.promptFeedback.blockReason)
+                || 'desconocido';
+            console.warn('[gemini] respuesta vacía, motivo=', motivo);
+            return json(200, { reply: `⚠ No se ha podido generar respuesta (motivo: ${motivo}). Reformula la consulta.` });
+        }
+
+        // Avisa si la respuesta se cortó, en lugar de entregarla truncada en silencio
+        const reply = cand.finishReason === 'MAX_TOKENS'
+            ? texto + '\n\n⚠ Respuesta truncada por longitud. Pide la parte que falte.'
+            : texto;
+
+        return json(200, { reply });
 
     } catch (err) {
+        const abortada = err.name === 'AbortError';
         console.error('[gemini] catch:', err);
-        return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+        return json(abortada ? 504 : 500, {
+            error: abortada
+                ? 'La consulta ha tardado demasiado. Inténtalo de nuevo.'
+                : 'Error interno del asistente.'
+        });
     }
 };
+
+function json(statusCode, obj) {
+    return {
+        statusCode,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        body: JSON.stringify(obj)
+    };
+}

@@ -163,6 +163,7 @@
         .cat-antiepilepsico{background:rgba(251,113,133,0.12);color:#fb7185;}
         .cat-metabolico{background:rgba(100,140,200,0.12);color:#93c5fd;}
         .cat-revertidor{background:rgba(167,139,250,0.12);color:#c4b5fd;}
+        .cat-antifibrinolitico{background:rgba(232,121,249,0.12);color:#f0abfc;}
         .cat-otro{background:rgba(100,120,150,0.12);color:#94a3b8;}
     </style>
 </head>
@@ -192,705 +193,101 @@
 </div>
 
 <script>
-const CATS = {
-    vasoactivo:       {label:'Vasoactivo',        color:'cat-vasoactivo',       dot:'#f87171'},
-    sedacion:         {label:'Sedación',           color:'cat-sedacion',         dot:'#a78bfa'},
-    analgesico:       {label:'Analgésico',         color:'cat-analgesico',       dot:'#fb923c'},
-    relajante:        {label:'Relajante muscular', color:'cat-relajante',        dot:'#14b8a6'},
-    antiarritmico:    {label:'Antiarrítmico',      color:'cat-antiarritmico',    dot:'#60a5fa'},
-    antihipertensivo: {label:'Antihipertensivo',   color:'cat-antihipertensivo', dot:'#4ade80'},
-    anticoagulante:   {label:'Anticoagulante',     color:'cat-anticoagulante',   dot:'#fbbf24'},
-    antiepilepsico:   {label:'Antiepiléptico',     color:'cat-antiepilepsico',   dot:'#fb7185'},
-    metabolico:       {label:'Metabólico',         color:'cat-metabolico',       dot:'#93c5fd'},
-    revertidor:       {label:'Revertidor',         color:'cat-revertidor',       dot:'#c4b5fd'},
-    otro:             {label:'Otro',               color:'cat-otro',             dot:'#94a3b8'},
+// ═══════════════════════════════════════════════════════════════════════════════
+//  MOTOR DE CÁLCULO — fuente única de verdad: farmacos.json
+//  Ningún ritmo está escrito a mano: TODOS se derivan de (dosis, unidad, kg, conc).
+//  Esto elimina por diseño las discrepancias entre la tarjeta y la calculadora.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Conversión entre la unidad de la DOSIS y la unidad de la CONCENTRACIÓN
+const FACTOR = {
+    'mg': { 'mg': 1,     'µg': 1000 },
+    'µg': { 'µg': 1,     'mg': 0.001 },
+    'UI': { 'UI': 1 }
 };
 
-// ─── BASE DE DATOS ────────────────────────────────────────────────────────────
-// calcPerfusion(kg) → { label, minMLh, maxMLh, nota }
-// null = sin calculadora (dosis fija no peso-dependiente o solo bolo)
-const farmacos = [
-    // ── SEDACIÓN ──────────────────────────────────────────────
-    {
-        id:'propofol1', nombreComercial:'DIPRIVAN 1%', principioActivo:'Propofol',
-        categoria:'sedacion',
-        presentacion:'20 mL = 200 mg',
-        bolo:'Sedación: 0,5–1 mg/kg. Intubación: 2–2,5 mg/kg',
-        perfusion:'1–6 mg/kg/h',
-        dilucion:'Puro (no diluir)',
-        concentracion:'1 mL = 10 mg',
-        ritmo70:'7–42 mL/h',
-        observaciones:'No administrar simultáneamente con Fentanilo por el mismo acceso.',
-        alertas:[],
-        contraindicaciones:'Alergia al huevo o soja',
-        incompatibilidades:'No administrar con Fentanilo',
-        calcPerfusion:(kg)=>{
-            const c=10;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(1*kg)/c,maxMLh:(6*kg)/c,nota:'1–6 mg/kg/h'};
-        }
-    },
-    {
-        id:'propofol2', nombreComercial:'DIPRIVAN 2%', principioActivo:'Propofol',
-        categoria:'sedacion',
-        presentacion:'20 mL = 400 mg',
-        bolo:'Sedación: 0,5–1 mg/kg. Intubación: 2–2,5 mg/kg',
-        perfusion:'1–6 mg/kg/h',
-        dilucion:'Puro (no diluir)',
-        concentracion:'1 mL = 20 mg',
-        ritmo70:'3,5–21 mL/h',
-        observaciones:'No administrar simultáneamente con Fentanilo por el mismo acceso.',
-        alertas:[],
-        contraindicaciones:'Alergia al huevo o soja',
-        incompatibilidades:'No administrar con Fentanilo',
-        calcPerfusion:(kg)=>{
-            const c=20;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(1*kg)/c,maxMLh:(6*kg)/c,nota:'1–6 mg/kg/h'};
-        }
-    },
-    {
-        id:'midazolam', nombreComercial:'DORMICUM', principioActivo:'Midazolam',
-        categoria:'sedacion',
-        presentacion:'1 amp 3 mL = 15 mg  /  1 amp 5 mL = 5 mg',
-        bolo:'Sedación: 0,03–0,1 mg/kg. Intubación: 0,1–0,4 mg/kg',
-        perfusion:'0,1–0,3 mg/kg/h',
-        dilucion:'3 amp de 15 mg (45 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL ≈ 0,9 mg',
-        ritmo70:'7–21 mL/h',
-        observaciones:'',
-        alertas:[],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=0.9;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.1*kg)/c,maxMLh:(0.3*kg)/c,nota:'0,1–0,3 mg/kg/h'};
-        }
-    },
-    {
-        id:'ketamina', nombreComercial:'KETOLAR', principioActivo:'Ketamina',
-        categoria:'sedacion',
-        presentacion:'1 vial 10 mL = 500 mg (50 mg/mL)',
-        bolo:'Inducción: 1–2 mg/kg IV (2–4 mg/kg IM). Analgesia: 0,25–0,5 mg/kg',
-        perfusion:'Sedoanalgesia: 1–3 mg/kg/h  |  Analgesia: 0,1–0,5 mg/kg/h',
-        dilucion:'1 vial (500 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 10 mg',
-        ritmo70:'7–21 mL/h (sedoanalgesia)',
-        observaciones:'Usar benzodiacepina concomitante para reducir alucinaciones.',
-        alertas:[],
-        contraindicaciones:'HTA severa no controlada, aumento de PIC (relativo)',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=10;
-            const min=(0.1*kg)/c, max=(3*kg)/c;
-            return {label:'Ritmo para '+kg+' kg',minMLh:min,maxMLh:max,nota:'0,1–0,5 (analgesia) | 1–3 mg/kg/h (sedación)'};
-        }
-    },
-    {
-        id:'dexmedetomidina', nombreComercial:'DEXDOR / PRECEDEX', principioActivo:'Dexmedetomidina',
-        categoria:'sedacion',
-        presentacion:'1 vial 2 mL = 200 µg (100 µg/mL)',
-        bolo:'Carga (opcional): 1 µg/kg en 10 min',
-        perfusion:'0,1–1,4 µg/kg/h',
-        dilucion:'2 viales (400 µg) en 50 mL SS0,9% o SG5%',
-        concentracion:'1 mL = 8 µg',
-        ritmo70:'0,9–12,3 mL/h',
-        observaciones:'Diluyente: SS0,9% o SG5%. Reducir dosis en ancianos/insuf. hepática.',
-        alertas:[],
-        contraindicaciones:'Bloqueo AV avanzado, bradicardia severa',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=8;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.1*kg)/c,maxMLh:(1.4*kg)/c,nota:'0,1–1,4 µg/kg/h'};
-        }
-    },
+/**
+ * Convierte una dosis a ritmo de bomba en mL/h.
+ * @param {number} dose   valor numérico de la dosis
+ * @param {string} unidad p.ej. 'µg/kg/min', 'mg/kg/h', 'mg/min', 'UI/h', 'mg/kg/día'
+ * @param {number} kg     peso del paciente
+ * @param {object} conc   {valor, unidad} por mL de la jeringa preparada
+ * @returns {number} mL/h
+ */
+function dosisAmLh(dose, unidad, kg, conc) {
+    const partes  = unidad.split('/');            // ['µg','kg','min']
+    const uDosis  = partes[0];
+    const porPeso = partes.includes('kg');
+    const tiempo  = partes[partes.length - 1];
 
-    // ── ANALGESIA ─────────────────────────────────────────────
-    {
-        id:'fentanilo', nombreComercial:'FENTANEST', principioActivo:'Fentanilo',
-        categoria:'analgesico',
-        presentacion:'1 amp = 3 mL = 150 µg (50 µg/mL)',
-        bolo:'1–3 µg/kg IV lento',
-        perfusion:'Analgesia: 1–2 µg/kg/h  |  Sedación: 3–15 µg/kg/h',
-        dilucion:'3 amp (450 µg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 9 µg',
-        ritmo70:'7,8–116,7 mL/h (rango completo)',
-        observaciones:'Diluyente: SS0,9%',
-        alertas:[],
-        contraindicaciones:null,
-        incompatibilidades:'No administrar con Propofol por el mismo acceso',
-        calcPerfusion:(kg)=>{
-            const c=9;
-            const min=(1*kg)/c, max=(15*kg)/c;
-            return {label:'Ritmo para '+kg+' kg',minMLh:min,maxMLh:max,nota:'1–2 µg/kg/h (analgesia) | 3–15 µg/kg/h (sedación)'};
-        }
-    },
-    {
-        id:'morfina', nombreComercial:'CLORURO MÓRFICO', principioActivo:'Morfina',
-        categoria:'analgesico',
-        presentacion:'1 amp = 1 mL = 10 mg',
-        bolo:'2–5 mg IV lento. Repetir c/15 min. Máx 25 mg.',
-        perfusion:'0,8–10 mg/h  (o 10–40 µg/kg/h)',
-        dilucion:'1 amp (10 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 0,2 mg',
-        ritmo70:'4–50 mL/h',
-        observaciones:'Diluyente: SS0,9%',
-        alertas:[],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=0.2;
-            const min=(10/1000*kg)/c, max=(40/1000*kg)/c;
-            return {label:'Ritmo para '+kg+' kg (µg/kg/h)',minMLh:min,maxMLh:max,nota:'10–40 µg/kg/h'};
-        }
-    },
-    // ── RELAJANTES NEUROMUSCULARES ────────────────────────────
-    {
-        id:'rocuronio', nombreComercial:'ESEMERÓN', principioActivo:'Rocuronio',
-        categoria:'relajante',
-        presentacion:'1 amp = 5 mL = 50 mg',
-        bolo:'IOT: 0,6–1,2 mg/kg. ISR: 1,2 mg/kg',
-        perfusion:'0,3–0,9 mg/kg/h',
-        dilucion:'1 amp (50 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 1 mg',
-        ritmo70:'21–63 mL/h',
-        observaciones:'Antídoto: Sugammadex. Diluyente: SS0,9%',
-        alertas:['bombaICC'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            return {label:'Ritmo para '+kg+' kg',minMLh:0.3*kg,maxMLh:0.9*kg,nota:'0,3–0,9 mg/kg/h'};
-        }
-    },
-    {
-        id:'cisatracurio', nombreComercial:'NIMBEX', principioActivo:'Cisatracurio',
-        categoria:'relajante',
-        presentacion:'10 mL = 20 mg',
-        bolo:'0,15 mg/kg',
-        perfusion:'1–3 µg/kg/min  (0,06–0,18 mg/kg/h)',
-        dilucion:'1 amp 20 mg en 50 mL SS0,9%',
-        concentracion:'1 mL = 0,4 mg = 400 µg',
-        ritmo70:'10,5–31,5 mL/h',
-        observaciones:'Diluyente: SS0,9%',
-        alertas:['bombaICC'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=400;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(1*kg*60)/c,maxMLh:(3*kg*60)/c,nota:'1–3 µg/kg/min'};
-        }
-    },
-    {
-        id:'atracurio', nombreComercial:'TRACURIO', principioActivo:'Atracurio besilato',
-        categoria:'relajante',
-        presentacion:'1 amp = 50 mg',
-        bolo:'0,3–0,6 mg/kg',
-        perfusion:'0,3–0,6 mg/kg/h',
-        dilucion:'1 amp (50 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 1 mg',
-        ritmo70:'21–42 mL/h',
-        observaciones:'Diluyente: SS0,9%',
-        alertas:['bombaICC'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            return {label:'Ritmo para '+kg+' kg',minMLh:0.3*kg,maxMLh:0.6*kg,nota:'0,3–0,6 mg/kg/h'};
-        }
-    },
-    {
-        id:'vecuronio', nombreComercial:'NORCURÓN', principioActivo:'Vecuronio',
-        categoria:'relajante',
-        presentacion:'1 amp = 10 mg (polvo)',
-        bolo:'0,1 mg/kg',
-        perfusion:'0,8–1,4 µg/kg/min  (0,048–0,084 mg/kg/h)',
-        dilucion:'5 amp (50 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 1 mg',
-        ritmo70:'3,4–5,9 mL/h',
-        observaciones:'Diluyente: SS0,9%',
-        alertas:['bombaICC'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=1000;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.8*kg*60)/c,maxMLh:(1.4*kg*60)/c,nota:'0,8–1,4 µg/kg/min'};
-        }
-    },
-    {
-        id:'succinilcolina', nombreComercial:'ANECTINE / MIOFLEX', principioActivo:'Succinilcolina',
-        categoria:'relajante',
-        presentacion:'1 amp = 2 mL = 100 mg (50 mg/mL)',
-        bolo:'1–1,5 mg/kg IV. ISR: 1,5 mg/kg',
-        perfusion:null,
-        dilucion:'Solo bolo — no perfusión continua',
-        concentracion:'50 mg/mL',
-        ritmo70:'N/A',
-        observaciones:'Relajante despolarizante. Acción 5–10 min. Sin antídoto (acción corta).',
-        alertas:[],
-        contraindicaciones:'Hiperpotasemia, quemaduras extensas >48h, miopatías',
-        incompatibilidades:null,
-        calcPerfusion:null,
-        calcBolo:(kg)=>[
-            {label:'Dosis estándar (1 mg/kg)',mg:1*kg,conc:50},
-            {label:'Dosis ISR (1,5 mg/kg)',mg:1.5*kg,conc:50},
-        ]
-    },
-    // ── VASOACTIVOS ───────────────────────────────────────────
-    {
-        id:'adrenalina', nombreComercial:'ADRENALINA', principioActivo:'Adrenalina',
-        categoria:'vasoactivo',
-        presentacion:'1 amp = 1 mL = 1 mg',
-        bolo:'PCR: 1 mg/3–5 min IV',
-        perfusion:'0,03–0,2 µg/kg/min',
-        dilucion:'5 amp (5 mg) en 50 mL SG5% o SS0,9%',
-        concentracion:'1 mL = 0,1 mg = 100 µg',
-        ritmo70:'0,76–5 mL/h',
-        observaciones:'Diluyente: SS0,9% o SG5%',
-        alertas:['viacentral'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=100;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.03*kg*60)/c,maxMLh:(0.2*kg*60)/c,nota:'0,03–0,2 µg/kg/min'};
-        }
-    },
-    {
-        id:'noradrenalina', nombreComercial:'NORADRENALINA', principioActivo:'Noradrenalina',
-        categoria:'vasoactivo',
-        presentacion:'1 amp = 10 mL = 10 mg (1 mg/mL)',
-        bolo:'No indicado',
-        perfusion:'2–20 µg/min (fija)  |  0,01–0,6 µg/kg/min (por peso)',
-        dilucion:'1 amp (10 mg) en 50 mL SG5% o SS0,9%',
-        concentracion:'1 mL = 0,2 mg = 200 µg',
-        ritmo70:'0,6–6 mL/h (2–20 µg/min)',
-        observaciones:'Diluyente: SS0,9% o SG5%',
-        alertas:['viacentral'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>({_dual:true, kg, c:200}),
-    },
-    {
-        id:'dopamina', nombreComercial:'DOPAMINA', principioActivo:'Dopamina',
-        categoria:'vasoactivo',
-        presentacion:'1 amp = 5 mL = 200 mg',
-        bolo:'No indicado',
-        perfusion:'2–20 µg/kg/min',
-        dilucion:'2 amp (400 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 8 mg = 8.000 µg',
-        ritmo70:'0,5–10,5 mL/h',
-        observaciones:'Diluyente: SG5%',
-        alertas:['viacentral'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=8000;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(2*kg*60)/c,maxMLh:(20*kg*60)/c,nota:'2–20 µg/kg/min'};
-        }
-    },
-    {
-        id:'dobutamina', nombreComercial:'DOBUTREX', principioActivo:'Dobutamina',
-        categoria:'vasoactivo',
-        presentacion:'1 amp = 20 mL = 250 mg',
-        bolo:'No indicado',
-        perfusion:'2,5–20 µg/kg/min',
-        dilucion:'1 amp (250 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 5 mg = 5.000 µg',
-        ritmo70:'2,1–16,8 mL/h',
-        observaciones:'Diluyente: SG5%',
-        alertas:['viacentral'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=5000;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(2.5*kg*60)/c,maxMLh:(20*kg*60)/c,nota:'2,5–20 µg/kg/min'};
-        }
-    },
-    {
-        id:'vasopresina', nombreComercial:'VASOPRESINA', principioActivo:'Vasopresina / ADH',
-        categoria:'vasoactivo',
-        presentacion:'1 amp = 1 mL = 20 UI',
-        bolo:'PCR: 40 UI IV dosis única',
-        perfusion:'0,01–0,04 UI/min (shock séptico)',
-        dilucion:'5 amp (100 UI) en 50 mL SS0,9%',
-        concentracion:'1 mL = 2 UI',
-        ritmo70:'0,3–1,2 mL/h',
-        observaciones:'Dosis fija, no depende del peso. Diluyente: SS0,9%',
-        alertas:['viacentral'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=2;
-            const r=(0.01*60)/c, rx=(0.04*60)/c;
-            return {label:'Perfusión (dosis fija, independiente del peso)',minMLh:r,maxMLh:rx,nota:'0,01–0,04 UI/min'};
-        }
-    },
-    {
-        id:'isoprenalina', nombreComercial:'ISOPRENALINA (ALEUDRINA)', principioActivo:'Isoproterenol',
-        categoria:'vasoactivo',
-        presentacion:'1 amp = 1 mL = 0,2 mg (200 µg)',
-        bolo:'No indicado',
-        perfusion:'0,01–0,2 µg/kg/min',
-        dilucion:'1 amp (200 µg) en 50 mL SG5%',
-        concentracion:'1 mL = 4 µg',
-        ritmo70:'6,3–126 mL/h',
-        observaciones:'Diluyente: SG5%. Para dosis altas considerar concentración mayor.',
-        alertas:['viacentral'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=4;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.01*kg*60)/c,maxMLh:(0.2*kg*60)/c,nota:'0,01–0,2 µg/kg/min'};
-        }
-    },
-    {
-        id:'levosimendán', nombreComercial:'SIMDAX', principioActivo:'Levosimendán',
-        categoria:'vasoactivo',
-        presentacion:'1 vial = 5 mL = 12,5 mg (2,5 mg/mL)',
-        bolo:'Carga (opc.): 6–12 µg/kg en 10 min',
-        perfusion:'0,05–0,2 µg/kg/min',
-        dilucion:'1 vial (12,5 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 0,25 mg = 250 µg',
-        ritmo70:'0,84–3,36 mL/h',
-        observaciones:'Perfusión de 24h. Diluyente: SG5%.',
-        alertas:['viacentral'],
-        contraindicaciones:'Hipotensión severa, obstrucción al tracto de salida, insuf. renal grave',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=250;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.05*kg*60)/c,maxMLh:(0.2*kg*60)/c,nota:'0,05–0,2 µg/kg/min'};
-        }
-    },
-    {
-        id:'milrinona', nombreComercial:'MILRINONA', principioActivo:'Milrinona',
-        categoria:'vasoactivo',
-        presentacion:'1 amp = 10 mL = 10 mg (1 mg/mL)',
-        bolo:'Carga: 50 µg/kg en 10 min',
-        perfusion:'0,375–0,75 µg/kg/min',
-        dilucion:'2 amp (20 mg) en 50 mL SG5% o SS0,9%',
-        concentracion:'1 mL = 0,4 mg = 400 µg',
-        ritmo70:'2,4–4,7 mL/h',
-        observaciones:'Diluyente: SG5% o SS0,9%',
-        alertas:['viacentral'],
-        contraindicaciones:'Estenosis aórtica/pulmonar severa, IAM agudo',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=400;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.375*kg*60)/c,maxMLh:(0.75*kg*60)/c,nota:'0,375–0,75 µg/kg/min'};
-        }
-    },
-    // ── ANTIHIPERTENSIVOS ─────────────────────────────────────
-    {
-        id:'nitropusiato', nombreComercial:'NITROPUSIATO DE SODIO', principioActivo:'Nitroprusiato sódico',
-        categoria:'antihipertensivo',
-        presentacion:'1 amp = 5 mL = 50 mg',
-        bolo:'No indicado',
-        perfusion:'0,5–10 µg/kg/min',
-        dilucion:'1 amp (50 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 1 mg = 1.000 µg',
-        ritmo70:'2,1–42 mL/h',
-        observaciones:'FOTOSENSIBLE. Cubrir jeringa y línea. Diluyente: SG5%',
-        alertas:['luz','viacentral'],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=1000;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(0.5*kg*60)/c,maxMLh:(10*kg*60)/c,nota:'0,5–10 µg/kg/min'};
-        }
-    },
-    {
-        id:'trandate', nombreComercial:'TRANDATE', principioActivo:'Labetalol',
-        categoria:'antihipertensivo',
-        presentacion:'1 amp = 20 mL = 100 mg',
-        bolo:'5–10 mg (1–2 mL) en 10 min. Repetir c/10 min hasta 300 mg total.',
-        perfusion:'0,5–2 mg/min',
-        dilucion:'1 amp (100 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 2 mg',
-        ritmo70:'15–60 mL/h',
-        observaciones:'Diluyente: SG5%',
-        alertas:[],
-        contraindicaciones:'EAP, bloqueo AV >1er grado, bradicardia, asma',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=2;
-            return {label:'Perfusión (dosis fija)',minMLh:(0.5*60)/c,maxMLh:(2*60)/c,nota:'0,5–2 mg/min'};
-        }
-    },
-    {
-        id:'nitroglicerina', nombreComercial:'SOLINITRINA', principioActivo:'Nitroglicerina',
-        categoria:'antihipertensivo',
-        presentacion:'1 amp 10 mL = 50 mg',
-        bolo:'No indicado',
-        perfusion:'5–200 µg/min  (0,3–12 mg/h)',
-        dilucion:'1 amp (50 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 1 mg = 1.000 µg',
-        ritmo70:'0,3–12 mL/h',
-        observaciones:'Diluyente: SG5%',
-        alertas:[],
-        contraindicaciones:'Hipotensión, uso reciente de sildenafilo/tadalafilo',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=1000;
-            return {label:'Perfusión (dosis fija)',minMLh:(5*60)/c,maxMLh:(200*60)/c,nota:'5–200 µg/min'};
-        }
-    },
-    {
-        id:'elgadil', nombreComercial:'ELGADIL', principioActivo:'Urapidilo',
-        categoria:'antihipertensivo',
-        presentacion:'1 amp = 10 mL = 50 mg (5 mg/mL)',
-        bolo:'1º: 25 mg en 20 s. 2º: 25 mg a los 5 min si no respuesta. 3º: 50 mg a los 5 min.',
-        perfusion:'9–30 mg/h',
-        dilucion:'1 amp (50 mg) en 50 mL SS0,9% o SG5%',
-        concentracion:'1 mL = 1 mg',
-        ritmo70:'9–30 mL/h',
-        observaciones:'Bolo puro sin diluir (5 mg/mL). Perfusión: diluir 1 amp en 50 mL. Vigilar hipotensión. CI: estenosis aórtica.',
-        alertas:[],
-        contraindicaciones:'Estenosis aórtica',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            return {label:'Perfusión (dosis fija)',minMLh:9,maxMLh:30,nota:'9–30 mg/h = 9–30 mL/h'};
-        },
-        calcBolo:(kg)=>[
-            {label:'1º bolo (fijo)',mg:25,conc:5,fixed:true},
-            {label:'2º bolo si no respuesta (fijo)',mg:25,conc:5,fixed:true},
-            {label:'3º bolo si no respuesta (fijo)',mg:50,conc:5,fixed:true},
-        ]
-    },
-    // ── ANTIARRÍTMICOS ────────────────────────────────────────
-    {
-        id:'amiodarona', nombreComercial:'TRANGOREX', principioActivo:'Amiodarona',
-        categoria:'antiarritmico',
-        presentacion:'1 amp = 3 mL = 150 mg',
-        bolo:'Carga: 2 amp (300 mg) en 100 mL SG5% en 20–30 min',
-        perfusion:'Mantenimiento: 0,5 mg/min (900 mg/24h)',
-        dilucion:'2 amp (300 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 6 mg',
-        ritmo70:'5 mL/h',
-        observaciones:'Diluyente: SG5%. Solo en cristal o PVC purgado.',
-        alertas:['viacentral'],
-        contraindicaciones:'Hipersensibilidad al yodo, bloqueo sinoauricular',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=6, r=(0.5*60)/c;
-            return {label:'Mantenimiento (dosis fija)',minMLh:r,maxMLh:r,nota:'0,5 mg/min = 5 mL/h = 900 mg/24h'};
-        }
-    },
-    {
-        id:'esmolol', nombreComercial:'BREVIBLOC', principioActivo:'Esmolol',
-        categoria:'antiarritmico',
-        presentacion:'1 vial = 10 mL = 100 mg',
-        bolo:'Carga: 500 µg/kg en 1 min',
-        perfusion:'50–300 µg/kg/min',
-        dilucion:'2 viales (200 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 4 mg = 4.000 µg',
-        ritmo70:'52–315 mL/h',
-        observaciones:'Vida media ~9 min. Titulación rápida. Diluyente: SS0,9%',
-        alertas:[],
-        contraindicaciones:'Bradicardia, bloqueo AV 2–3er grado, asma activa, IC descompensada',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=4000;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(50*kg*60)/c,maxMLh:(300*kg*60)/c,nota:'50–300 µg/kg/min'};
-        }
-    },
-    {
-        id:'lidocaina', nombreComercial:'LIDOCAÍNA IV', principioActivo:'Lidocaína',
-        categoria:'antiarritmico',
-        presentacion:'1 amp = 10 mL = 100 mg (10 mg/mL)',
-        bolo:'Carga: 1–1,5 mg/kg IV en 2–3 min',
-        perfusion:'1–4 mg/min',
-        dilucion:'2 amp (200 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 4 mg',
-        ritmo70:'15–60 mL/h',
-        observaciones:'Diluyente: SG5%. Monitorizar ECG.',
-        alertas:[],
-        contraindicaciones:'Bloqueo AV completo, bloqueo de rama izquierda, hipersensibilidad',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=4;
-            return {label:'Perfusión (dosis fija)',minMLh:(1*60)/c,maxMLh:(4*60)/c,nota:'1–4 mg/min'};
-        }
-    },
-    {
-        id:'diltiazem', nombreComercial:'MASDIL / ANGIODROX', principioActivo:'Diltiazem',
-        categoria:'antiarritmico',
-        presentacion:'1 vial polvo = 25 mg',
-        bolo:'0,25 mg/kg IV en 2 min. Repetir 0,35 mg/kg si precisa.',
-        perfusion:'5–15 mg/h',
-        dilucion:'2 viales (50 mg) en 50 mL SS0,9% o SG5%',
-        concentracion:'1 mL = 1 mg',
-        ritmo70:'5–15 mL/h',
-        observaciones:'Diluyente: SS0,9% o SG5%. Monitorizar FC y PA.',
-        alertas:[],
-        contraindicaciones:'Bloqueo AV 2–3er grado, disfunción sinusal, WPW con FA, IC sistólica grave',
-        incompatibilidades:null,
-        calcPerfusion:null
-    },
-    // ── ANTIEPILÉPTICOS ───────────────────────────────────────
-    {
-        id:'fenitoina', nombreComercial:'FENITOÍNA', principioActivo:'Fenitoína',
-        categoria:'antiepilepsico',
-        presentacion:'1 vial = 250 mg',
-        bolo:'Carga: 15–20 mg/kg IV. VEL. MÁX.: 50 mg/min (riesgo hipotensión/arritmia).',
-        perfusion:'5–6 mg/kg/día',
-        dilucion:'1 vial (250 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 5 mg',
-        ritmo70:'2,9–3,7 mL/h',
-        observaciones:'SOLO SS0,9%. NUNCA SG5% (precipita). Monitorizar ECG durante carga.',
-        alertas:['velocidad'],
-        contraindicaciones:'Bloqueo AV 2–3er grado, bradicardia sinusal',
-        incompatibilidades:'NUNCA con SG5% — precipita',
-        calcPerfusion:(kg)=>{
-            const c=5;
-            return {label:'Mantenimiento para '+kg+' kg',minMLh:(5*kg/24)/c,maxMLh:(6*kg/24)/c,nota:'5–6 mg/kg/día'};
-        }
-    },
-    {
-        id:'valproato', nombreComercial:'DEPAKINE', principioActivo:'Valproato sódico',
-        categoria:'antiepilepsico',
-        presentacion:'1 vial polvo = 400 mg',
-        bolo:'Carga: 20–25 mg/kg en 50–100 mL en 30 min',
-        perfusion:'1–2 mg/kg/h',
-        dilucion:'1 vial (400 mg) en 50 mL SS0,9% o SG5%',
-        concentracion:'1 mL = 8 mg',
-        ritmo70:'8,75–17,5 mL/h',
-        observaciones:'Diluyente: SS0,9% o SG5%',
-        alertas:[],
-        contraindicaciones:'Hepatopatía activa',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=8;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(1*kg)/c,maxMLh:(2*kg)/c,nota:'1–2 mg/kg/h'};
-        }
-    },
-    // ── ANTICOAGULANTES ───────────────────────────────────────
-    {
-        id:'heparina', nombreComercial:'HEPARINA SÓDICA', principioActivo:'Heparina sódica',
-        categoria:'anticoagulante',
-        presentacion:'1 vial = 5 mL = 25.000 UI',
-        bolo:'Según guías (ej. TEP/IAM). Habitualmente 80 UI/kg.',
-        perfusion:'Según control de APTT. Inicio: 1.000 UI/h.',
-        dilucion:'1 vial (25.000 UI) en 50 mL SS0,9%',
-        concentracion:'1 mL = 500 UI',
-        ritmo70:'Inicio: 2 mL/h. Ajustar según APTT.',
-        observaciones:'REQUIERE CONTROL ANALÍTICO (APTT) ANTES DE AJUSTAR DOSIS. Diluyente: SS0,9%',
-        alertas:[],
-        contraindicaciones:'Hemorragia activa, trombocitopenia inducida por heparina (HIT)',
-        incompatibilidades:null,
-        calcPerfusion:null
-    },
-    {
-        id:'tranexamico', nombreComercial:'AMCHAFIBRIN / ÁCIDO TRANEXÁMICO', principioActivo:'Ácido tranexámico',
-        categoria:'anticoagulante',
-        presentacion:'1 amp = 5 mL = 500 mg',
-        bolo:'1 g IV en 10 min (iniciar en <3h del trauma)',
-        perfusion:'1 g en 8h tras el bolo inicial',
-        dilucion:'2 amp (1.000 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 20 mg',
-        ritmo70:'6,25 mL/h (1 g/8h)',
-        observaciones:'PROTOCOLO HEMORRAGIA MASIVA. Diluyente: SS0,9% o SG5%. Administrar dentro de las 3h del traumatismo.',
-        alertas:[],
-        contraindicaciones:'Trombosis activa, antecedente de convulsiones con tranexámico',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const mgPerH=(1000/8), c=20;
-            const r=mgPerH/c;
-            return {label:'Perfusión de mantenimiento (dosis fija)',minMLh:r,maxMLh:r,nota:'1 g en 8h = 6,25 mL/h'};
-        }
-    },
-    // ── METABÓLICOS ───────────────────────────────────────────
-    {
-        id:'insulina', nombreComercial:'INSULINA ACTRAPID', principioActivo:'Insulina regular (rápida)',
-        categoria:'metabolico',
-        presentacion:'Vial multidosis = 100 UI/mL',
-        bolo:'Según glucemia y pauta médica',
-        perfusion:'Inicio: 0,5–1 UI/h. Titular según glucemia.',
-        dilucion:'50 UI en 50 mL SS0,9%',
-        concentracion:'1 mL = 1 UI',
-        ritmo70:'Inicio habitual: 1–6 mL/h (1–6 UI/h). Ajustar según pauta.',
-        observaciones:'Diluyente: SS0,9%. La insulina se adsorbe al PVC; purgar 20 mL antes. Protocolo hospitalario SUC: inicio a 6 UI/h.',
-        alertas:[],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:null
-    },
-    {
-        id:'furosemida', nombreComercial:'SEGURIL', principioActivo:'Furosemida',
-        categoria:'metabolico',
-        presentacion:'1 amp = 2 mL = 20 mg',
-        bolo:'20–80 mg IV lento',
-        perfusion:'Inicio: 10 mg/h. Titular según diuresis.',
-        dilucion:'5 amp (100 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 2 mg',
-        ritmo70:'5 mL/h (inicio)',
-        observaciones:'Diluyente: SS0,9%. Monitorizar diuresis y electrolitos.',
-        alertas:[],
-        contraindicaciones:'Hipovolemia, anuria, hipopotasemia grave',
-        incompatibilidades:null,
-        calcPerfusion:null
-    },
-    // ── OTROS ─────────────────────────────────────────────────
-    {
-        id:'omeprazol', nombreComercial:'LOSEC / NEXIUM', principioActivo:'Omeprazol / Esomeprazol',
-        categoria:'otro',
-        presentacion:'1 vial polvo = 40 mg',
-        bolo:'40–80 mg IV lento',
-        perfusion:'8 mg/h (indicación: HDA activa)',
-        dilucion:'3 viales (120 mg) en 50 mL SS0,9%',
-        concentracion:'1 mL = 2,4 mg',
-        ritmo70:'3,3 mL/h',
-        observaciones:'Diluyente: SS0,9%',
-        alertas:[],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:null
-    },
-    {
-        id:'flumazenilo', nombreComercial:'ANEXATE', principioActivo:'Flumazenilo',
-        categoria:'revertidor',
-        presentacion:'1 amp = 10 mL = 1 mg',
-        bolo:'0,2 mg IV en 15 s. Repetir c/1 min hasta 1 mg total.',
-        perfusion:'0,1–0,4 mg/h (dosis fija)',
-        dilucion:'1 amp (1 mg) en 50 mL SS0,9% o SG5%',
-        concentracion:'1 mL = 0,02 mg = 20 µg',
-        ritmo70:'5–20 mL/h',
-        observaciones:'Vida media corta (~1h). Vigilar re-sedación. Dosis fija independiente del peso.',
-        alertas:[],
-        contraindicaciones:'Dependencia a BZD crónica (precipita abstinencia)',
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=0.02;
-            const minMLh=0.1/c, maxMLh=0.4/c;
-            return {label:'Perfusión (dosis fija)',minMLh,maxMLh,nota:'0,1–0,4 mg/h'};
-        }
-    },
-    {
-        id:'naloxona', nombreComercial:'NALOXONE', principioActivo:'Naloxona',
-        categoria:'revertidor',
-        presentacion:'1 amp = 1 mL = 0,4 mg',
-        bolo:'0,4–2 mg IV. Repetir c/2–3 min hasta 10 mg.',
-        perfusion:'2–10 µg/kg/h',
-        dilucion:'10 amp (4 mg) en 50 mL SG5%',
-        concentracion:'1 mL = 0,08 mg = 80 µg',
-        ritmo70:'1,75–8,75 mL/h',
-        observaciones:'Diluyente: GS5%. Vida media 60–90 min. Vigilar re-narcotización.',
-        alertas:[],
-        contraindicaciones:null,
-        incompatibilidades:null,
-        calcPerfusion:(kg)=>{
-            const c=80;
-            return {label:'Ritmo para '+kg+' kg',minMLh:(2*kg)/c,maxMLh:(10*kg)/c,nota:'2–10 µg/kg/h'};
-        }
-    },
-];
+    let porHora = dose * (porPeso ? kg : 1);
+    if (tiempo === 'min') porHora *= 60;          // /min → /h
+    if (tiempo === 'día') porHora /= 24;          // /día → /h
+
+    const f = FACTOR[uDosis] && FACTOR[uDosis][conc.unidad];
+    if (f == null) return NaN;                    // conversión imposible (p.ej. mg ↔ UI)
+    return (porHora * f) / conc.valor;
+}
+
+/** Rango [min,max] en mL/h de un modo de perfusión */
+function rangoModo(modo, kg, conc) {
+    return {
+        min: dosisAmLh(modo.min, modo.unidad, kg, conc),
+        max: dosisAmLh(modo.max, modo.unidad, kg, conc)
+    };
+}
+
+/** Minutos que dura una jeringa de 50 mL a un ritmo dado */
+const duracionJeringa = mLh => (mLh > 0 ? (50 / mLh) * 60 : Infinity);
+
+const fmt = n => (Number.isFinite(n) ? n.toFixed(2).replace(/\.00$/, '').replace('.', ',') : '—');
+
+/** Texto de ritmo de referencia (70 kg) para la tarjeta — SIEMPRE calculado */
+function ritmoRef(f, kg = 70) {
+    if (!f.modos || f.modos.length === 0) return 'Solo bolo';
+    return f.modos.map(m => {
+        const r = rangoModo(m, kg, f.conc);
+        const val = Math.abs(r.min - r.max) < 0.01
+            ? `${fmt(r.min)} mL/h`
+            : `${fmt(r.min)}–${fmt(r.max)} mL/h`;
+        return f.modos.length > 1 ? `${m.nombre}: ${val}` : val;
+    }).join(' · ');
+}
+
+// ── CATEGORÍAS ────────────────────────────────────────────────────────────────
+const CATS = {
+    vasoactivo:        {label:'Vasoactivo',         color:'cat-vasoactivo',        dot:'#f87171'},
+    sedacion:          {label:'Sedación',           color:'cat-sedacion',          dot:'#a78bfa'},
+    analgesico:        {label:'Analgésico',         color:'cat-analgesico',        dot:'#fb923c'},
+    relajante:         {label:'Relajante muscular', color:'cat-relajante',         dot:'#14b8a6'},
+    antiarritmico:     {label:'Antiarrítmico',      color:'cat-antiarritmico',     dot:'#60a5fa'},
+    antihipertensivo:  {label:'Antihipertensivo',   color:'cat-antihipertensivo',  dot:'#4ade80'},
+    anticoagulante:    {label:'Anticoagulante',     color:'cat-anticoagulante',    dot:'#fbbf24'},
+    antifibrinolitico: {label:'Antifibrinolítico',  color:'cat-antifibrinolitico', dot:'#f0abfc'},
+    antiepilepsico:    {label:'Antiepiléptico',     color:'cat-antiepilepsico',    dot:'#fb7185'},
+    metabolico:        {label:'Metabólico',         color:'cat-metabolico',        dot:'#93c5fd'},
+    revertidor:        {label:'Revertidor',         color:'cat-revertidor',        dot:'#c4b5fd'},
+    otro:              {label:'Otro',               color:'cat-otro',              dot:'#94a3b8'},
+};
+
+// ── DATOS (cargados de farmacos.json) ─────────────────────────────────────────
+let farmacos = [];
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 const normalize = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+));
 
 function hl(text, term) {
-    if (!term || !text) return text || '';
-    const t = String(text), nt = normalize(t), nn = normalize(term);
+    const t = esc(text);
+    if (!term) return t;
+    const nt = normalize(t), nn = normalize(term);
     if (!nn) return t;
     let r = '', i = 0;
     while (i < t.length) {
         if (nt.slice(i).startsWith(nn)) {
-            r += `<span class="hl">${t.slice(i, i+term.length)}</span>`;
+            r += `<span class="hl">${t.slice(i, i + term.length)}</span>`;
             i += term.length;
         } else { r += t[i]; i++; }
     }
@@ -898,12 +295,12 @@ function hl(text, term) {
 }
 
 function alertTags(f) {
-    const a = f.alertas||[];
+    const a = f.alertas || [];
     const tags = [];
     if (a.includes('viacentral')) tags.push(['warn-vc','↑ VÍA CENTRAL']);
-    if (a.includes('luz'))         tags.push(['warn-luz','☀ FOTOSENSIBLE']);
-    if (a.includes('velocidad'))   tags.push(['warn-vel','⚠ VEL. MÁX.']);
-    if (a.includes('bombaICC'))    tags.push(['warn-bomb','⊞ BOMBA JERINGA']);
+    if (a.includes('luz'))        tags.push(['warn-luz','☀ FOTOSENSIBLE']);
+    if (a.includes('velocidad'))  tags.push(['warn-vel','⚠ VEL. MÁX.']);
+    if (a.includes('bombaICC'))   tags.push(['warn-bomb','⊞ BOMBA JERINGA']);
     return tags;
 }
 
@@ -917,14 +314,14 @@ function renderFilters() {
     wrap.innerHTML = '';
     const mkBtn = (key, label, dot) => {
         const b = document.createElement('button');
-        b.className = 'filter-btn' + (activeFilter===key?' active':'');
+        b.className = 'filter-btn' + (activeFilter === key ? ' active' : '');
         b.innerHTML = dot ? `<span class="filter-dot" style="background:${dot}"></span>${label}` : label;
-        b.onclick = () => { activeFilter=key; renderAll(); };
+        b.onclick = () => { activeFilter = key; renderAll(); };
         wrap.appendChild(b);
     };
     mkBtn('all','Todos');
-    [...new Set(farmacos.map(f=>f.categoria))].sort().forEach(cat=>{
-        const c=CATS[cat]; if(c) mkBtn(cat,c.label,c.dot);
+    [...new Set(farmacos.map(f => f.categoria))].sort().forEach(cat => {
+        const c = CATS[cat]; if (c) mkBtn(cat, c.label, c.dot);
     });
 }
 
@@ -932,43 +329,43 @@ function renderFilters() {
 function renderAll() {
     renderFilters();
     const container = document.getElementById('farmacosContainer');
-    const noRes = document.getElementById('noResults');
-    const countEl = document.getElementById('resultCount');
+    const noRes     = document.getElementById('noResults');
+    const countEl   = document.getElementById('resultCount');
     container.innerHTML = '';
 
-    let filtered = farmacos.filter(f=>{
+    const filtered = farmacos.filter(f => {
         const ms = !searchTerm ||
             normalize(f.nombreComercial).includes(normalize(searchTerm)) ||
             normalize(f.principioActivo).includes(normalize(searchTerm));
-        const mf = activeFilter==='all' || f.categoria===activeFilter;
+        const mf = activeFilter === 'all' || f.categoria === activeFilter;
         return ms && mf;
-    }).sort((a,b)=>a.nombreComercial.localeCompare(b.nombreComercial,'es'));
+    }).sort((a,b) => a.nombreComercial.localeCompare(b.nombreComercial,'es'));
 
-    countEl.innerHTML = `<span>${filtered.length}</span> fármaco${filtered.length!==1?'s':''}`;
-    noRes.style.display = filtered.length===0 ? 'block' : 'none';
+    countEl.innerHTML = `<span>${filtered.length}</span> fármaco${filtered.length !== 1 ? 's' : ''}`;
+    noRes.style.display = filtered.length === 0 ? 'block' : 'none';
 
-    filtered.forEach((f,i)=>{
-        const c = CATS[f.categoria]||CATS.otro;
+    filtered.forEach((f,i) => {
+        const c = CATS[f.categoria] || CATS.otro;
         const tags = alertTags(f);
         const card = document.createElement('div');
-        card.className='card';
-        card.style.animationDelay=(i*20)+'ms';
-        card.onclick=()=>openModal(f);
-        card.innerHTML=`
+        card.className = 'card';
+        card.style.animationDelay = (i*20) + 'ms';
+        card.onclick = () => openModal(f);
+        card.innerHTML = `
             <div class="card-top">
                 <div>
-                    <div class="card-name">${hl(f.nombreComercial,searchTerm)}</div>
-                    <div class="card-pa">${hl(f.principioActivo,searchTerm)}</div>
+                    <div class="card-name">${hl(f.nombreComercial, searchTerm)}</div>
+                    <div class="card-pa">${hl(f.principioActivo, searchTerm)}</div>
                 </div>
                 <span class="cat-badge ${c.color}">${c.label}</span>
             </div>
             <div class="card-body">
-                <div class="card-row"><span class="card-label">Presentación</span><span class="card-val">${f.presentacion}</span></div>
-                <div class="card-row"><span class="card-label">Dilución 50 cc</span><span class="card-val key">${f.dilucion}</span></div>
-                <div class="card-row"><span class="card-label">Concentración</span><span class="card-val key">${f.concentracion}</span></div>
-                <div class="card-row"><span class="card-label">Ritmo (~70 kg)</span><span class="card-val">${f.ritmo70}</span></div>
+                <div class="card-row"><span class="card-label">Presentación</span><span class="card-val">${esc(f.presentacion)}</span></div>
+                <div class="card-row"><span class="card-label">Preparación</span><span class="card-val key">${esc(f.dilucion)}</span></div>
+                <div class="card-row"><span class="card-label">Concentración</span><span class="card-val key">${esc(f.concTexto)}</span></div>
+                <div class="card-row"><span class="card-label">Ritmo (~70 kg)</span><span class="card-val">${esc(ritmoRef(f))}</span></div>
             </div>
-            ${tags.length>0?`<div class="card-footer">${tags.map(([cls,lbl])=>`<span class="warn-tag ${cls}">${lbl}</span>`).join('')}</div>`:''}
+            ${tags.length ? `<div class="card-footer">${tags.map(([cls,lbl]) => `<span class="warn-tag ${cls}">${lbl}</span>`).join('')}</div>` : ''}
         `;
         container.appendChild(card);
     });
@@ -976,206 +373,207 @@ function renderAll() {
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 let currentFarmaco = null;
+let modoActivo = 0;
 
 function openModal(f) {
     currentFarmaco = f;
-    const c = CATS[f.categoria]||CATS.otro;
-    const a = f.alertas||[];
+    modoActivo = 0;
+    const c = CATS[f.categoria] || CATS.otro;
+    const a = f.alertas || [];
+
     const pills = [];
-    if (a.includes('viacentral'))  pills.push(`<span class="alert-pill alert-vc">↑ VÍA CENTRAL OBLIGATORIA</span>`);
-    if (a.includes('luz'))          pills.push(`<span class="alert-pill alert-luz">☀ FOTOSENSIBLE — CUBRIR LÍNEA</span>`);
-    if (a.includes('velocidad'))    pills.push(`<span class="alert-pill alert-vel">⚠ VELOCIDAD MÁXIMA RESTRINGIDA</span>`);
-    if (a.includes('bombaICC'))     pills.push(`<span class="alert-pill alert-bomb">⊞ SIEMPRE EN BOMBA DE JERINGA</span>`);
-    if (f.contraindicaciones)       pills.push(`<span class="alert-pill alert-ci">✕ CI: ${f.contraindicaciones}</span>`);
-    if (f.incompatibilidades)       pills.push(`<span class="alert-pill alert-inc">≠ INC: ${f.incompatibilidades}</span>`);
+    if (a.includes('viacentral')) pills.push(`<span class="alert-pill alert-vc">↑ VÍA CENTRAL OBLIGATORIA</span>`);
+    if (a.includes('luz'))        pills.push(`<span class="alert-pill alert-luz">☀ FOTOSENSIBLE — CUBRIR LÍNEA</span>`);
+    if (a.includes('velocidad'))  pills.push(`<span class="alert-pill alert-vel">⚠ VELOCIDAD MÁXIMA RESTRINGIDA</span>`);
+    if (a.includes('bombaICC'))   pills.push(`<span class="alert-pill alert-bomb">⊞ SIEMPRE EN BOMBA DE JERINGA</span>`);
+    if (f.contraindicaciones)     pills.push(`<span class="alert-pill alert-ci">✕ CI: ${esc(f.contraindicaciones)}</span>`);
+    if (f.incompatibilidades)     pills.push(`<span class="alert-pill alert-inc">≠ INC: ${esc(f.incompatibilidades)}</span>`);
 
-    const hasCalc = typeof f.calcPerfusion==='function';
-    const hasCalcBolo = typeof f.calcBolo==='function';
-    const isDual = hasCalc && f.calcPerfusion(70)?._dual === true;
+    const hasCalc     = Array.isArray(f.modos) && f.modos.length > 0;
+    const hasCalcBolo = Array.isArray(f.boloModos) && f.boloModos.length > 0;
+    const multiModo   = hasCalc && f.modos.length > 1;
+    const presets     = [40,50,60,70,80,90,100,110,120];
 
-    document.getElementById('modalContent').innerHTML=`
-        <div class="modal-name">${f.nombreComercial}</div>
-        <div class="modal-pa">${f.principioActivo} · <span class="${c.color}" style="padding:2px 8px;border-radius:5px;font-size:0.65rem;">${c.label}</span></div>
-        ${pills.length>0?`<div class="modal-alerts">${pills.join('')}</div>`:''}
+    document.getElementById('modalContent').innerHTML = `
+        <div class="modal-name">${esc(f.nombreComercial)}</div>
+        <div class="modal-pa">${esc(f.principioActivo)} · <span class="${c.color}" style="padding:2px 8px;border-radius:5px;font-size:0.65rem;">${c.label}</span></div>
+        ${pills.length ? `<div class="modal-alerts">${pills.join('')}</div>` : ''}
+
         <div class="modal-section-title">Preparación</div>
         <table class="modal-table">
-            <tr><td>Presentación</td><td>${f.presentacion}</td></tr>
-            <tr><td>Dilución (50 cc)</td><td class="val-key">${f.dilucion}</td></tr>
-            <tr><td>Concentración</td><td class="val-key">${f.concentracion}</td></tr>
+            <tr><td>Presentación</td><td>${esc(f.presentacion)}</td></tr>
+            <tr><td>Preparación</td><td class="val-key">${esc(f.dilucion)}</td></tr>
+            <tr><td>Concentración</td><td class="val-key">${esc(f.concTexto)}</td></tr>
         </table>
+
         <div class="modal-section-title">Dosificación</div>
         <table class="modal-table">
-            ${f.bolo?`<tr><td>Bolo</td><td>${f.bolo}</td></tr>`:''}
-            ${f.perfusion?`<tr><td>Perfusión</td><td>${f.perfusion}</td></tr>`:''}
-            <tr><td>Ritmo ref. (70 kg)</td><td class="val-key">${f.ritmo70}</td></tr>
-            ${f.observaciones?`<tr><td>Observaciones</td><td>${f.observaciones}</td></tr>`:''}
+            ${f.bolo ? `<tr><td>Bolo</td><td>${esc(f.bolo)}</td></tr>` : ''}
+            ${hasCalc ? `<tr><td>Perfusión</td><td>${f.modos.map(m => `${esc(m.nombre)}: ${fmt(m.min)}–${fmt(m.max)} ${esc(m.unidad)}`).join('<br>')}</td></tr>` : ''}
+            <tr><td>Ritmo ref. (70 kg)</td><td class="val-key">${esc(ritmoRef(f))}</td></tr>
+            ${f.observaciones ? `<tr><td>Observaciones</td><td>${esc(f.observaciones)}</td></tr>` : ''}
         </table>
-        ${hasCalcBolo?`
+
+        ${hasCalcBolo ? `
         <div class="calc-bolo-box">
             <div class="calc-bolo-title">⊕ Calculadora de dosis en bolo</div>
             <div class="calc-input-row">
                 <label>Peso (kg)</label>
-                <input type="number" class="kg-input" id="kgBoloInput" value="70" min="10" max="200" step="1">
+                <input type="number" class="kg-input" id="kgBoloInput" value="70" min="1" max="250" step="1">
             </div>
             <div class="kg-presets" id="boloPresets">
-                ${[40,50,60,70,80,90,100,110,120].map(k=>`<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
+                ${presets.map(k => `<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
             </div>
             <div id="boloResults"></div>
-        </div>`:''}
-        ${hasCalc?`
+        </div>` : ''}
+
+        ${hasCalc ? `
         <div class="calc-box">
             <div class="calc-title">⊕ Calculadora de perfusión</div>
-            ${isDual?`
-            <div class="calc-mode-wrap">
-                <button class="calc-mode-btn active" id="modeFixed">µg/min (fija)</button>
-                <button class="calc-mode-btn" id="modeWeight">µg/kg/min (por peso)</button>
-            </div>`:''}
-            <div class="calc-input-row" id="kgRow" style="${isDual?'display:none':''}">
+            ${multiModo ? `<div class="calc-mode-wrap" id="modeWrap">
+                ${f.modos.map((m,i) => `<button class="calc-mode-btn${i===0?' active':''}" data-modo="${i}">${esc(m.nombre)}</button>`).join('')}
+            </div>` : ''}
+            <div class="calc-input-row" id="kgRow">
                 <label>Peso (kg)</label>
-                <input type="number" class="kg-input" id="kgInput" value="70" min="10" max="200" step="1">
+                <input type="number" class="kg-input" id="kgInput" value="70" min="1" max="250" step="1">
             </div>
-            ${isDual?'':`<div class="kg-presets">
-                ${[40,50,60,70,80,90,100,110,120].map(k=>`<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
-            </div>`}
-            <div id="kgPresetsWrap" style="display:none"><div class="kg-presets">
-                ${[40,50,60,70,80,90,100,110,120].map(k=>`<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
-            </div></div>
+            <div class="kg-presets" id="perfPresets">
+                ${presets.map(k => `<button class="kg-preset${k===70?' active':''}" data-kg="${k}">${k}</button>`).join('')}
+            </div>
             <div class="calc-result" id="calcResult"></div>
-        </div>`:''}
+        </div>` : ''}
     `;
 
+    // ── Bolo ──
     if (hasCalcBolo) {
         updateCalcBolo(70);
-        document.getElementById('kgBoloInput').addEventListener('input', e=>{
-            const v=parseInt(e.target.value);
-            if(v>=10&&v<=200){updateCalcBolo(v);updateBoloActive(v);}
+        document.getElementById('kgBoloInput').addEventListener('input', e => {
+            const v = parseFloat(e.target.value);
+            if (v >= 1 && v <= 250) {
+                updateCalcBolo(v);
+                document.querySelectorAll('#boloPresets .kg-preset')
+                    .forEach(b => b.classList.toggle('active', parseFloat(b.dataset.kg) === v));
+            }
         });
-        document.querySelectorAll('#boloPresets .kg-preset').forEach(btn=>{
-            btn.addEventListener('click',()=>{
-                const kg=parseInt(btn.dataset.kg);
-                document.getElementById('kgBoloInput').value=kg;
-                updateCalcBolo(kg); updateBoloActive(kg);
+        // Selector acotado: ya no colisiona con los presets de perfusión
+        document.querySelectorAll('#boloPresets .kg-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const kg = parseInt(btn.dataset.kg);
+                document.getElementById('kgBoloInput').value = kg;
+                updateCalcBolo(kg);
+                document.querySelectorAll('#boloPresets .kg-preset')
+                    .forEach(b => b.classList.toggle('active', parseInt(b.dataset.kg) === kg));
             });
         });
     }
 
+    // ── Perfusión ──
     if (hasCalc) {
-        if (isDual) {
-            // modo fija por defecto
-            updateCalcDual('fixed', 70);
-            document.getElementById('modeFixed').addEventListener('click', ()=>{
-                document.getElementById('modeFixed').classList.add('active');
-                document.getElementById('modeWeight').classList.remove('active');
-                document.getElementById('kgRow').style.display='none';
-                document.getElementById('kgPresetsWrap').style.display='none';
-                updateCalcDual('fixed', parseInt(document.getElementById('kgInput').value)||70);
+        updateCalc(70);
+        const kgInput = document.getElementById('kgInput');
+
+        // Si NINGÚN modo depende del peso, ocultar el selector de peso
+        const algunoPorPeso = f.modos.some(m => m.unidad.includes('/kg'));
+        if (!algunoPorPeso) {
+            document.getElementById('kgRow').style.display = 'none';
+            document.getElementById('perfPresets').style.display = 'none';
+        }
+
+        kgInput.addEventListener('input', e => {
+            const v = parseFloat(e.target.value);
+            if (v >= 1 && v <= 250) {
+                updateCalc(v);
+                document.querySelectorAll('#perfPresets .kg-preset')
+                    .forEach(b => b.classList.toggle('active', parseFloat(b.dataset.kg) === v));
+            }
+        });
+        document.querySelectorAll('#perfPresets .kg-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const kg = parseInt(btn.dataset.kg);
+                kgInput.value = kg;
+                updateCalc(kg);
+                document.querySelectorAll('#perfPresets .kg-preset')
+                    .forEach(b => b.classList.toggle('active', parseInt(b.dataset.kg) === kg));
             });
-            document.getElementById('modeWeight').addEventListener('click', ()=>{
-                document.getElementById('modeWeight').classList.add('active');
-                document.getElementById('modeFixed').classList.remove('active');
-                document.getElementById('kgRow').style.display='flex';
-                document.getElementById('kgPresetsWrap').style.display='block';
-                updateCalcDual('weight', parseInt(document.getElementById('kgInput').value)||70);
-            });
-            document.getElementById('kgInput').addEventListener('input', e=>{
-                const v=parseInt(e.target.value);
-                if(v>=10&&v<=200) updateCalcDual('weight', v);
-            });
-            document.querySelectorAll('#kgPresetsWrap .kg-preset').forEach(btn=>{
-                btn.addEventListener('click',()=>{
-                    const kg=parseInt(btn.dataset.kg);
-                    document.getElementById('kgInput').value=kg;
-                    updateCalcDual('weight', kg);
-                    document.querySelectorAll('#kgPresetsWrap .kg-preset').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.kg)===kg));
-                });
-            });
-        } else {
-            updateCalc(70);
-            document.getElementById('kgInput').addEventListener('input', e=>{
-                const v=parseInt(e.target.value);
-                if(v>=10&&v<=200){updateCalc(v);updateActive(v);}
-            });
-            document.querySelectorAll('.kg-preset').forEach(btn=>{
-                btn.addEventListener('click',()=>{
-                    const kg=parseInt(btn.dataset.kg);
-                    document.getElementById('kgInput').value=kg;
-                    updateCalc(kg); updateActive(kg);
+        });
+        if (multiModo) {
+            document.querySelectorAll('#modeWrap .calc-mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    modoActivo = parseInt(btn.dataset.modo);
+                    document.querySelectorAll('#modeWrap .calc-mode-btn')
+                        .forEach(b => b.classList.toggle('active', parseInt(b.dataset.modo) === modoActivo));
+                    const m = currentFarmaco.modos[modoActivo];
+                    const porPeso = m.unidad.includes('/kg');
+                    document.getElementById('kgRow').style.display        = porPeso ? 'flex'  : 'none';
+                    document.getElementById('perfPresets').style.display  = porPeso ? 'flex'  : 'none';
+                    updateCalc(parseFloat(kgInput.value) || 70);
                 });
             });
         }
     }
 
     document.getElementById('modalBackdrop').classList.add('open');
-    document.body.style.overflow='hidden';
+    document.body.style.overflow = 'hidden';
 }
 
-function updateBoloActive(kg){
-    document.querySelectorAll('#boloPresets .kg-preset').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.kg)===kg));
-}
+function updateCalcBolo(kg) {
+    const f = currentFarmaco;
+    if (!f || !Array.isArray(f.boloModos)) return;
+    const el = document.getElementById('boloResults');
+    if (!el) return;
 
-function updateCalcBolo(kg){
-    if(!currentFarmaco||typeof currentFarmaco.calcBolo!=='function') return;
-    const doses=currentFarmaco.calcBolo(kg);
-    const el=document.getElementById('boloResults'); if(!el) return;
-    el.innerHTML=doses.map(d=>{
-        const mg=d.fixed?d.mg:d.mg;
-        const vol=d.conc?(mg/d.conc).toFixed(2)+' mL':'—';
-        const doseLabel=d.fixed?mg.toFixed(0)+' mg (fijo)':mg.toFixed(1)+' mg';
+    el.innerHTML = f.boloModos.map(d => {
+        const u    = d.unidadBolo || 'mg';
+        let dosis, fijo = false;
+        if (d.mgFijo != null)      { dosis = d.mgFijo;   fijo = true; }
+        else if (d.uiKg != null)   { dosis = d.uiKg * kg; }
+        else                       { dosis = d.mgKg * kg; }
+
+        const vol   = d.conc ? (dosis / d.conc) : null;
+        const dTxt  = fijo ? `${fmt(dosis)} ${u} (fijo)` : `${fmt(dosis)} ${u}`;
+        const vTxt  = vol != null ? `${fmt(vol)} mL` : '—';
         return `<div class="bolo-result-row">
-            <div class="bolo-result-label">${d.label}</div>
-            <div class="bolo-result-value">${doseLabel}</div>
-            <div class="bolo-result-vol">Volumen: ${vol} (conc. ${d.conc} mg/mL)</div>
+            <div class="bolo-result-label">${esc(d.label)}</div>
+            <div class="bolo-result-value">${dTxt}</div>
+            <div class="bolo-result-vol">Volumen: ${vTxt} (${esc(String(d.conc))} ${u}/mL, sin diluir)</div>
         </div>`;
     }).join('');
 }
 
-function updateActive(kg){
-    document.querySelectorAll('.kg-preset').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.kg)===kg));
-}
-
-function updateCalcDual(mode, kg){
+function updateCalc(kg) {
     const f = currentFarmaco;
-    if(!f) return;
-    const el = document.getElementById('calcResult'); if(!el) return;
-    const c = f.calcPerfusion(kg).c; // concentración µg/mL
-    if(mode==='fixed'){
-        // dosis fija µg/min
-        const minMcgMin=2, maxMcgMin=20;
-        const minMLh=(minMcgMin*60)/c;
-        const maxMLh=(maxMcgMin*60)/c;
-        el.innerHTML=`
-            <div class="calc-result-label">Perfusión dosis fija</div>
-            <div class="calc-result-value">${minMLh.toFixed(2)} – ${maxMLh.toFixed(2)} mL/h</div>
-            <div class="calc-result-detail">2–20 µg/min · concentración ${c} µg/mL</div>`;
-    } else {
-        // dosis por peso µg/kg/min
-        const minMLh=(0.01*kg*60)/c;
-        const maxMLh=(0.6*kg*60)/c;
-        el.innerHTML=`
-            <div class="calc-result-label">Ritmo para ${kg} kg</div>
-            <div class="calc-result-value">${minMLh.toFixed(2)} – ${maxMLh.toFixed(2)} mL/h</div>
-            <div class="calc-result-detail">0,01–0,6 µg/kg/min · concentración ${c} µg/mL</div>`;
-    }
-}
+    if (!f || !Array.isArray(f.modos) || !f.modos.length) return;
+    const el = document.getElementById('calcResult');
+    if (!el) return;
 
-function updateCalc(kg){
-    if(!currentFarmaco||typeof currentFarmaco.calcPerfusion!=='function') return;
-    const res=currentFarmaco.calcPerfusion(kg);
-    const el=document.getElementById('calcResult'); if(!el) return;
-    const same=Math.abs(res.minMLh-res.maxMLh)<0.01;
-    const val=same ? res.minMLh.toFixed(2)+' mL/h' : res.minMLh.toFixed(2)+' – '+res.maxMLh.toFixed(2)+' mL/h';
-    el.innerHTML=`
-        <div class="calc-result-label">${res.label}</div>
+    const m = f.modos[modoActivo] || f.modos[0];
+    const r = rangoModo(m, kg, f.conc);
+    const porPeso = m.unidad.includes('/kg');
+    const igual   = Math.abs(r.min - r.max) < 0.005;
+
+    const val   = igual ? `${fmt(r.min)} mL/h` : `${fmt(r.min)} – ${fmt(r.max)} mL/h`;
+    const label = porPeso ? `${m.nombre} — ${kg} kg` : `${m.nombre} — dosis fija (independiente del peso)`;
+
+    // Aviso operativo: jeringa de 50 mL agotada en poco tiempo al ritmo máximo
+    const dur = duracionJeringa(r.max);
+    const aviso = dur < 30
+        ? `<div class="calc-result-detail" style="color:#fbbf24;margin-top:0.4rem;">⚠ Al ritmo máximo la jeringa de 50 mL se agota en ~${Math.round(dur)} min. Valorar dilución más concentrada o bomba volumétrica.</div>`
+        : '';
+
+    el.innerHTML = `
+        <div class="calc-result-label">${esc(label)}</div>
         <div class="calc-result-value">${val}</div>
-        <div class="calc-result-detail">${res.nota}</div>
+        <div class="calc-result-detail">${fmt(m.min)}–${fmt(m.max)} ${esc(m.unidad)} · concentración ${esc(f.concTexto)}</div>
+        ${aviso}
     `;
 }
 
-function closeModal(){
+function closeModal() {
     document.getElementById('modalBackdrop').classList.remove('open');
-    document.body.style.overflow='';
-    currentFarmaco=null;
+    document.body.style.overflow = '';
+    currentFarmaco = null;
 }
+
 
 document.getElementById('modalClose').onclick=closeModal;
 document.getElementById('modalBackdrop').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
@@ -1188,7 +586,20 @@ document.getElementById('searchInput').addEventListener('input',e=>{
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-renderAll();
+async function init(){
+    try {
+        const res = await fetch('./farmacos.json', {cache:'no-cache'});
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        farmacos = await res.json();
+        renderAll();
+    } catch(err) {
+        console.error('Error cargando farmacos.json:', err);
+        document.getElementById('farmacosContainer').innerHTML =
+            '<div style="padding:2rem;text-align:center;color:#f87171;">'+
+            'No se pudo cargar la base de f\u00e1rmacos.<br>Recarga la p\u00e1gina con conexi\u00f3n.</div>';
+    }
+}
+init();
 
 if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
@@ -1314,7 +725,11 @@ function appendMsg(role, text) {
     const div = document.createElement('div');
     div.className = 'chat-msg ' + role;
     // Convertir **negrita** básica
-    div.innerHTML = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    // Escapar SIEMPRE antes de inyectar; solo después aplicar **negrita** y saltos
+    const seguro = String(text).replace(/[&<>"']/g, c => (
+        {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+    ));
+    div.innerHTML = seguro.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return div;

@@ -1,0 +1,8 @@
+{
+  "name": "Guía Rápida de Perfusión SUC",
+  "description": "Guía de consulta de diluciones y ritmos de perfusión para emergencias en pacientes adultos del SUC.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

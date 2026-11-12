@@ -1,0 +1,2171 @@
+// GENERADO AUTOMÁTICAMENTE desde public/farmacos.json — NO EDITAR A MANO.
+// Edita public/farmacos.json y ejecuta "npm run sync".
+import { DrugDataset } from '../types';
+
+export const defaultDataset: DrugDataset = {
+  "meta": {
+    "version": "2.1.0-borrador",
+    "estado": "BORRADOR — NO VALIDADO",
+    "fechaGeneracion": "2026-11-12",
+    "fechaAprobacion": null,
+    "farmaceuticoResponsable": null,
+    "proximaRevision": null,
+    "volumenEstandar": 50,
+    "pesoMin": 30,
+    "pesoMax": 250,
+    "resolucionBomba": 0.1,
+    "usoPrevisto": "Herramienta de apoyo a la preparación de perfusiones en pacientes ADULTOS por personal sanitario del SUC. NO sustituye a la prescripción facultativa ni a la ficha técnica. Requiere verificación por un segundo profesional antes de la administración. NO válida para pacientes pediátricos ni de peso inferior a 30 kg.",
+    "notas": [
+      "Campo 'referencia' pendiente de cumplimentar por Farmacia para cada fármaco.",
+      "Los registros con estado 'revisar' requieren decisión expresa de Farmacia antes de la aprobación."
+    ]
+  },
+  "farmacos": [
+    {
+      "id": "propofol1",
+      "nombreComercial": "DIPRIVAN 1%",
+      "principioActivo": "Propofol 1 %",
+      "categoria": "sedacion",
+      "presentacion": "Vial 20 mL = 200 mg (10 mg/mL)",
+      "puro": true,
+      "volFarmaco": 50,
+      "diluyente": null,
+      "dosisTotalNum": 500,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "Cargar de vial(es) de 20 mL",
+      "volumenFinal": 50,
+      "dilucion": "PURO — no diluir. Cargar directamente en jeringa.",
+      "conc": {
+        "valor": 10,
+        "unidad": "mg"
+      },
+      "bolo": "Sedación: 0,5–1 mg/kg. Inducción IOT: 2–2,5 mg/kg",
+      "boloModos": [
+        {
+          "label": "Sedación (0,5 mg/kg)",
+          "porKg": 0.5,
+          "unidadBolo": "mg",
+          "conc": 10,
+          "maxDosis": 100
+        },
+        {
+          "label": "Inducción IOT (2 mg/kg)",
+          "porKg": 2,
+          "unidadBolo": "mg",
+          "conc": 10,
+          "maxDosis": 300
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Sedación",
+          "min": 1,
+          "max": 6,
+          "unidad": "mg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "magro",
+      "estabilidad": "Administrar en las 12 h siguientes a la carga de la jeringa. Desechar restos.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Hipotensión dosis-dependiente. Reducir dosis en ancianos e inestabilidad hemodinámica.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": "Alergia al huevo o soja",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 500,
+      "volPorAmp": 50,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "propofol2",
+      "nombreComercial": "DIPRIVAN 2%",
+      "principioActivo": "Propofol 2 %",
+      "categoria": "sedacion",
+      "presentacion": "Vial 20 mL = 400 mg (20 mg/mL)",
+      "puro": true,
+      "volFarmaco": 50,
+      "diluyente": null,
+      "dosisTotalNum": 1000,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "Cargar de vial(es) de 20 mL",
+      "volumenFinal": 50,
+      "dilucion": "PURO — no diluir. Cargar directamente en jeringa.",
+      "conc": {
+        "valor": 20,
+        "unidad": "mg"
+      },
+      "bolo": "Sedación: 0,5–1 mg/kg. Inducción IOT: 2–2,5 mg/kg",
+      "boloModos": [
+        {
+          "label": "Sedación (0,5 mg/kg)",
+          "porKg": 0.5,
+          "unidadBolo": "mg",
+          "conc": 20,
+          "maxDosis": 100
+        },
+        {
+          "label": "Inducción IOT (2 mg/kg)",
+          "porKg": 2,
+          "unidadBolo": "mg",
+          "conc": 20,
+          "maxDosis": 300
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Sedación",
+          "min": 1,
+          "max": 6,
+          "unidad": "mg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "magro",
+      "estabilidad": "Preparar de forma aséptica. Desechar restos.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Hipotensión dosis-dependiente. Reducir dosis en ancianos e inestabilidad hemodinámica.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": "Alergia al huevo o soja",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 1000,
+      "volPorAmp": 50,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "midazolam",
+      "nombreComercial": "DORMICUM",
+      "principioActivo": "Midazolam",
+      "categoria": "sedacion",
+      "presentacion": "1 amp 3 mL = 15 mg (5 mg/mL)",
+      "volFarmaco": 9,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 45,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "3 amp de 15 mg",
+      "volumenFinal": 50,
+      "dilucion": "3 amp de 15 mg (45 mg) + 41 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 0.9,
+        "unidad": "mg"
+      },
+      "bolo": "Sedación: 0,03–0,1 mg/kg. Inducción IOT: 0,1–0,4 mg/kg",
+      "boloModos": [
+        {
+          "label": "Sedación (0,05 mg/kg)",
+          "porKg": 0.05,
+          "unidadBolo": "mg",
+          "conc": 5,
+          "maxDosis": 5
+        },
+        {
+          "label": "Inducción IOT (0,2 mg/kg)",
+          "porKg": 0.2,
+          "unidadBolo": "mg",
+          "conc": 5,
+          "maxDosis": 20
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Sedación",
+          "min": 0.1,
+          "max": 0.3,
+          "unidad": "mg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Antídoto: flumazenilo. Acumulación en perfusión prolongada e insuficiencia renal.",
+      "alertas": [],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 3,
+      "dosisPorAmp": 15,
+      "volPorAmp": 3,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp",
+      "otrasPresentaciones": [
+        "1 amp 5 mL = 5 mg (1 mg/mL) — para bolos; NO usar para esta receta"
+      ]
+    },
+    {
+      "id": "ketamina",
+      "nombreComercial": "KETOLAR",
+      "principioActivo": "Ketamina",
+      "categoria": "sedacion",
+      "presentacion": "1 vial 10 mL = 500 mg (50 mg/mL)",
+      "volFarmaco": 10,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 500,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 vial",
+      "volumenFinal": 50,
+      "dilucion": "1 vial (500 mg) + 40 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 10,
+        "unidad": "mg"
+      },
+      "bolo": "Inducción: 1–2 mg/kg IV (2–4 mg/kg IM). Analgesia: 0,25–0,5 mg/kg",
+      "boloModos": [
+        {
+          "label": "Analgesia (0,25 mg/kg)",
+          "porKg": 0.25,
+          "unidadBolo": "mg",
+          "conc": 50,
+          "maxDosis": 50
+        },
+        {
+          "label": "Inducción IV (1,5 mg/kg)",
+          "porKg": 1.5,
+          "unidadBolo": "mg",
+          "conc": 50,
+          "maxDosis": 200
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Analgesia",
+          "min": 0.1,
+          "max": 0.5,
+          "unidad": "mg/kg/h"
+        },
+        {
+          "nombre": "Sedoanalgesia",
+          "min": 1,
+          "max": 3,
+          "unidad": "mg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Benzodiacepina concomitante para reducir reacciones de emergencia. Los dos modos son pautas ALTERNATIVAS, no acumulables.",
+      "alertas": [
+        "modosAlternativos"
+      ],
+      "contraindicaciones": "HTA severa no controlada; PIC elevada (relativo)",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 500,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "dexmedetomidina",
+      "nombreComercial": "DEXDOR / PRECEDEX",
+      "principioActivo": "Dexmedetomidina",
+      "categoria": "sedacion",
+      "presentacion": "1 vial 2 mL = 200 µg (100 µg/mL)",
+      "volFarmaco": 4,
+      "diluyente": "SS0,9% o SG5%",
+      "dosisTotalNum": 400,
+      "dosisTotalUnidad": "µg",
+      "nAmp": "2 viales",
+      "volumenFinal": 50,
+      "dilucion": "2 viales (400 µg) + 46 mL SS0,9% o SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 8,
+        "unidad": "µg"
+      },
+      "bolo": "Carga (opcional, valorar riesgo de bradicardia e hipotensión): 1 µg/kg en 10 min",
+      "boloModos": [
+        {
+          "label": "Carga (1 µg/kg en 10 min)",
+          "porKg": 1,
+          "unidadBolo": "µg",
+          "conc": 100,
+          "maxDosis": 120
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Sedación",
+          "min": 0.1,
+          "max": 1.4,
+          "unidad": "µg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Reducir dosis en ancianos e insuficiencia hepática. No produce depresión respiratoria significativa.",
+      "alertas": [],
+      "contraindicaciones": "Bloqueo AV avanzado, bradicardia severa",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 2,
+      "dosisPorAmp": 200,
+      "volPorAmp": 2,
+      "unidadPorAmp": "µg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "fentanilo",
+      "nombreComercial": "FENTANEST",
+      "principioActivo": "Fentanilo",
+      "categoria": "analgesico",
+      "presentacion": "1 amp 3 mL = 150 µg (50 µg/mL)",
+      "volFarmaco": 9,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 450,
+      "dosisTotalUnidad": "µg",
+      "nAmp": "3 amp",
+      "volumenFinal": 50,
+      "dilucion": "3 amp (450 µg) + 41 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 9,
+        "unidad": "µg"
+      },
+      "bolo": "1–3 µg/kg IV lento",
+      "boloModos": [
+        {
+          "label": "Analgesia (1 µg/kg)",
+          "porKg": 1,
+          "unidadBolo": "µg",
+          "conc": 50,
+          "maxDosis": 150
+        },
+        {
+          "label": "Inducción (3 µg/kg)",
+          "porKg": 3,
+          "unidadBolo": "µg",
+          "conc": 50,
+          "maxDosis": 400
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Analgesia",
+          "min": 0.5,
+          "max": 2,
+          "unidad": "µg/kg/h"
+        },
+        {
+          "nombre": "Sedoanalgesia",
+          "min": 2,
+          "max": 5,
+          "unidad": "µg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Los dos modos son pautas ALTERNATIVAS, no acumulables. Titular a efecto. Rigidez torácica con bolos rápidos a dosis altas.",
+      "alertas": [
+        "modosAlternativos"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 3,
+      "dosisPorAmp": 150,
+      "volPorAmp": 3,
+      "unidadPorAmp": "µg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "morfina",
+      "nombreComercial": "CLORURO MÓRFICO",
+      "principioActivo": "Morfina",
+      "categoria": "analgesico",
+      "presentacion": "1 amp 1 mL = 10 mg",
+      "volFarmaco": 1,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 10,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (10 mg) + 49 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 0.2,
+        "unidad": "mg"
+      },
+      "bolo": "2–5 mg IV lento. Repetir c/15 min. Máx. 25 mg.",
+      "boloModos": [
+        {
+          "label": "Bolo inicial (3 mg, fijo)",
+          "fijo": 3,
+          "unidadBolo": "mg",
+          "conc": 10
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Por peso",
+          "min": 10,
+          "max": 40,
+          "unidad": "µg/kg/h"
+        },
+        {
+          "nombre": "Dosis fija",
+          "min": 0.8,
+          "max": 3,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Los dos modos son pautas ALTERNATIVAS, NO acumulables. Titular a efecto. Acumulación en insuficiencia renal.",
+      "alertas": [
+        "modosAlternativos"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 10,
+      "volPorAmp": 1,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "rocuronio",
+      "nombreComercial": "ESMERON",
+      "principioActivo": "Rocuronio",
+      "categoria": "relajante",
+      "presentacion": "1 amp 5 mL = 50 mg (10 mg/mL)",
+      "volFarmaco": 5,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 50,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (50 mg) + 45 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 1,
+        "unidad": "mg"
+      },
+      "bolo": "IOT: 0,6–1,2 mg/kg. ISR: 1,2 mg/kg",
+      "boloModos": [
+        {
+          "label": "IOT (0,6 mg/kg)",
+          "porKg": 0.6,
+          "unidadBolo": "mg",
+          "conc": 10,
+          "maxDosis": 80
+        },
+        {
+          "label": "IOT / ISR (1,2 mg/kg)",
+          "porKg": 1.2,
+          "unidadBolo": "mg",
+          "conc": 10,
+          "maxDosis": 150
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.3,
+          "max": 0.9,
+          "unidad": "mg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "ideal",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución. Conservar viales en nevera.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Antídoto: sugammadex. NUNCA administrar sin sedación concomitante confirmada.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 50,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "cisatracurio",
+      "nombreComercial": "NIMBEX",
+      "principioActivo": "Cisatracurio",
+      "categoria": "relajante",
+      "presentacion": "1 amp 10 mL = 20 mg (2 mg/mL)",
+      "volFarmaco": 10,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 20,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (20 mg) + 40 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 400,
+        "unidad": "µg"
+      },
+      "bolo": "0,15 mg/kg",
+      "boloModos": [
+        {
+          "label": "IOT (0,15 mg/kg)",
+          "porKg": 0.15,
+          "unidadBolo": "mg",
+          "conc": 2,
+          "maxDosis": 20
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 1,
+          "max": 3,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "ideal",
+      "estabilidad": "24 h en nevera tras la dilución. Conservar viales refrigerados.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Eliminación de Hofmann: no requiere ajuste renal ni hepático. NUNCA sin sedación concomitante confirmada.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 20,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "atracurio",
+      "nombreComercial": "TRACRIUM",
+      "principioActivo": "Atracurio besilato",
+      "categoria": "relajante",
+      "presentacion": "1 amp 5 mL = 50 mg (10 mg/mL)",
+      "volFarmaco": 5,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 50,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (50 mg) + 45 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 1,
+        "unidad": "mg"
+      },
+      "bolo": "0,3–0,6 mg/kg",
+      "boloModos": [
+        {
+          "label": "IOT (0,5 mg/kg)",
+          "porKg": 0.5,
+          "unidadBolo": "mg",
+          "conc": 10,
+          "maxDosis": 60
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.3,
+          "max": 0.6,
+          "unidad": "mg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "ideal",
+      "estabilidad": "Mezcla diluida: administrar en las 24 h siguientes. La ampolla íntegra se conserva en nevera (2–8 °C); fuera de nevera, hasta 14 días y NO se puede reintroducir en frío.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Liberación histamínica con bolos rápidos. NUNCA sin sedación concomitante confirmada.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "CORREGIDO: la nota original ('estable 14 días a temperatura ambiente') podía leerse como referida a la mezcla diluida. Se aclara que aplica a la ampolla íntegra.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 50,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "vecuronio",
+      "nombreComercial": "NORCURON",
+      "principioActivo": "Vecuronio",
+      "categoria": "relajante",
+      "presentacion": "1 vial polvo = 10 mg",
+      "polvo": true,
+      "volFarmaco": 0,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 10,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 vial",
+      "volumenFinal": 50,
+      "dilucion": "1 vial (10 mg) — reconstituir y COMPLETAR HASTA 50 mL con SS0,9% (volumen final 50 mL)",
+      "conc": {
+        "valor": 200,
+        "unidad": "µg"
+      },
+      "bolo": "0,1 mg/kg (reconstituir 1 vial de 10 mg en 10 mL → 1 mg/mL)",
+      "boloModos": [
+        {
+          "label": "IOT (0,1 mg/kg)",
+          "porKg": 0.1,
+          "unidadBolo": "mg",
+          "conc": 1,
+          "maxDosis": 15
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.8,
+          "max": 1.4,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "ideal",
+      "estabilidad": "24 h a temperatura ambiente tras la reconstitución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Acumulación en insuficiencia renal y hepática. NUNCA sin sedación concomitante confirmada.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 10,
+      "volPorAmp": 0,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "succinilcolina",
+      "nombreComercial": "ANECTINE / MIOFLEX",
+      "principioActivo": "Succinilcolina",
+      "categoria": "relajante",
+      "presentacion": "1 amp 2 mL = 100 mg (50 mg/mL)",
+      "puro": true,
+      "volFarmaco": 2,
+      "diluyente": null,
+      "dosisTotalNum": 100,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 2,
+      "dilucion": "SOLO BOLO — no se usa en perfusión continua. Ampolla sin diluir (50 mg/mL).",
+      "conc": {
+        "valor": 50,
+        "unidad": "mg"
+      },
+      "bolo": "1–1,5 mg/kg IV. ISR: 1,5 mg/kg",
+      "boloModos": [
+        {
+          "label": "Estándar (1 mg/kg)",
+          "porKg": 1,
+          "unidadBolo": "mg",
+          "conc": 50,
+          "maxDosis": 150
+        },
+        {
+          "label": "ISR (1,5 mg/kg)",
+          "porKg": 1.5,
+          "unidadBolo": "mg",
+          "conc": 50,
+          "maxDosis": 200
+        }
+      ],
+      "modos": [],
+      "pesoDosificacion": "real",
+      "estabilidad": "CONSERVAR EN NEVERA (2–8 °C). Fuera de nevera, validez limitada (consultar ficha técnica del lote).",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Relajante despolarizante. Duración 5–10 min. Sin antídoto. Se dosifica por PESO REAL (total), no ideal.",
+      "alertas": [
+        "frio"
+      ],
+      "contraindicaciones": "Hiperpotasemia, quemaduras >48 h, aplastamiento, miopatías, antecedente de hipertermia maligna, lesión medular/denervación >72 h",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDO: requisito de conservación en nevera, ausente en el dataset original.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 100,
+      "volPorAmp": 2,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "adrenalina",
+      "nombreComercial": "ADRENALINA",
+      "principioActivo": "Adrenalina",
+      "categoria": "vasoactivo",
+      "presentacion": "1 amp 1 mL = 1 mg (1:1.000)",
+      "volFarmaco": 5,
+      "diluyente": "SS0,9% o SG5%",
+      "dosisTotalNum": 5,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "5 amp",
+      "volumenFinal": 50,
+      "dilucion": "5 amp (5 mg) + 45 mL SS0,9% o SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 100,
+        "unidad": "µg"
+      },
+      "bolo": "PCR: 1 mg IV cada 3–5 min (ampolla 1:1.000 sin diluir)",
+      "boloModos": [
+        {
+          "label": "PCR (1 mg, fijo)",
+          "fijo": 1,
+          "unidadBolo": "mg",
+          "conc": 1
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.03,
+          "max": 0.2,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución. Proteger de la luz.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Vía central preferente. Si se usa vía periférica, vigilar extravasación (antídoto: fentolamina).",
+      "alertas": [
+        "viacentral",
+        "bombaICC",
+        "luz"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": "Inactivación en soluciones alcalinas (bicarbonato)",
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS alertas 'bombaICC' y 'luz', ausentes en el dataset original pese a ser aplicables.",
+      "ampollasBase": 5,
+      "dosisPorAmp": 1,
+      "volPorAmp": 1,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "noradrenalina",
+      "nombreComercial": "NORADRENALINA (bitartrato) — dosis en BASE",
+      "principioActivo": "Noradrenalina",
+      "categoria": "vasoactivo",
+      "presentacion": "1 amp 10 mL = 10 mg de noradrenalina BASE (1 mg/mL)",
+      "volFarmaco": 10,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 10,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (10 mg base) + 40 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 200,
+        "unidad": "µg"
+      },
+      "bolo": "No indicado en perfusión estándar. (Push-dose en situaciones puntuales, fuera del alcance de esta guía.)",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Por peso",
+          "min": 0.01,
+          "max": 0.6,
+          "unidad": "µg/kg/min"
+        },
+        {
+          "nombre": "Dosis fija",
+          "min": 2,
+          "max": 40,
+          "unidad": "µg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución. Proteger de la luz.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "VERIFICAR SIEMPRE si la ampolla disponible expresa la dosis en BASE o en SAL (bitartrato), forma habitual en españa bitartrato: 2 mg de bitartrato ≈ 1 mg de base. Vasopresor de primera línea en shock séptico. Los dos modos son ALTERNATIVOS, no acumulables.",
+      "alertas": [
+        "viacentral",
+        "bombaICC",
+        "luz",
+        "modosAlternativos"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": "Inactivación en soluciones alcalinas",
+      "estado": "corregido",
+      "notaRevision": "CORREGIDO: el modo 'Dosis fija' pasa de 2–20 a 2–40 µg/min para que coincida con el modo 'Por peso' (0,6 µg/kg/min = 42 µg/min a 70 kg). En el dataset original los dos modos diferían en un factor 2,1×. AÑADIDA advertencia base/sal y orden de modos con 'Por peso' primero.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 10,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "dopamina",
+      "nombreComercial": "DOPAMINA",
+      "principioActivo": "Dopamina",
+      "categoria": "vasoactivo",
+      "presentacion": "1 amp 5 mL = 200 mg (40 mg/mL)",
+      "volFarmaco": 5,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 200,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (200 mg) + 45 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 4000,
+        "unidad": "µg"
+      },
+      "bolo": "No indicado",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 2,
+          "max": 20,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Mayor incidencia de arritmias que noradrenalina en shock. Vigilar extravasación.",
+      "alertas": [
+        "viacentral",
+        "bombaICC"
+      ],
+      "contraindicaciones": "Taquiarritmias, feocromocitoma",
+      "incompatibilidades": "Inactivación en soluciones alcalinas",
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 200,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "dobutamina",
+      "nombreComercial": "DOBUTREX",
+      "principioActivo": "Dobutamina",
+      "categoria": "vasoactivo",
+      "presentacion": "1 amp 20 mL = 250 mg (12,5 mg/mL)",
+      "volFarmaco": 20,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 250,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (250 mg) + 30 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 5000,
+        "unidad": "µg"
+      },
+      "bolo": "No indicado",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 2.5,
+          "max": 20,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Inotrópico: puede bajar la PA por vasodilatación. No usar como vasopresor aislado en shock séptico.",
+      "alertas": [
+        "viacentral",
+        "bombaICC"
+      ],
+      "contraindicaciones": "Miocardiopatía hipertrófica obstructiva",
+      "incompatibilidades": "Inactivación en soluciones alcalinas",
+      "estado": "corregido",
+      "notaRevision": "AÑADIDA alerta 'bombaICC'.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 250,
+      "volPorAmp": 20,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "vasopresina",
+      "nombreComercial": "VASOPRESINA",
+      "principioActivo": "Vasopresina",
+      "categoria": "vasoactivo",
+      "presentacion": "1 amp 1 mL = 20 UI",
+      "volFarmaco": 5,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 100,
+      "dosisTotalUnidad": "UI",
+      "nAmp": "5 amp",
+      "volumenFinal": 50,
+      "dilucion": "5 amp (100 UI) + 45 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 2,
+        "unidad": "UI"
+      },
+      "bolo": "NO indicado en PCR (retirado de las guías ERC/AHA desde 2015).",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Shock séptico",
+          "min": 0.01,
+          "max": 0.04,
+          "unidad": "UI/min"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA, no depende del peso. Coadyuvante para reducir dosis de noradrenalina. No titular al alza por encima de 0,04 UI/min.",
+      "alertas": [
+        "viacentral",
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDA alerta 'bombaICC'. A 0,01 UI/min el ritmo es de 0,3 mL/h: verificar que la bomba del SUC puede programar ese caudal.",
+      "ampollasBase": 5,
+      "dosisPorAmp": 20,
+      "volPorAmp": 1,
+      "unidadPorAmp": "UI",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "isoprenalina",
+      "nombreComercial": "ALEUDRINA",
+      "principioActivo": "Isoprenalina (isoproterenol)",
+      "categoria": "vasoactivo",
+      "presentacion": "1 amp 1 mL = 0,2 mg (200 µg)",
+      "volFarmaco": 1,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 200,
+      "dosisTotalUnidad": "µg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (200 µg) + 49 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 4,
+        "unidad": "µg"
+      },
+      "bolo": "No indicado",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Bradicardia / torsades",
+          "min": 0.5,
+          "max": 10,
+          "unidad": "µg/min"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución. Proteger de la luz.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA, no depende del peso. Titular a respuesta de frecuencia cardiaca.",
+      "alertas": [
+        "viacentral",
+        "bombaICC",
+        "luz"
+      ],
+      "contraindicaciones": "Taquiarritmias, cardiopatía isquémica aguda",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 200,
+      "volPorAmp": 1,
+      "unidadPorAmp": "µg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "levosimendan",
+      "nombreComercial": "SIMDAX",
+      "principioActivo": "Levosimendán",
+      "categoria": "vasoactivo",
+      "presentacion": "1 vial 5 mL = 12,5 mg (2,5 mg/mL)",
+      "volFarmaco": 5,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 12.5,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 vial",
+      "volumenFinal": 50,
+      "dilucion": "1 vial (12,5 mg) + 45 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 250,
+        "unidad": "µg"
+      },
+      "bolo": "Carga (opcional, omitir si hipotensión): 6–12 µg/kg en 10 min",
+      "boloModos": [
+        {
+          "label": "Carga (6 µg/kg en 10 min)",
+          "porKg": 6,
+          "unidadBolo": "µg",
+          "conc": 2500,
+          "maxDosis": 750
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.05,
+          "max": 0.2,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h tras la dilución. Proteger de la luz.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Perfusión continua durante 24 h. Diluir SOLO en SG5%.",
+      "alertas": [
+        "viacentral",
+        "bombaICC",
+        "luz"
+      ],
+      "contraindicaciones": "Hipotensión severa, obstrucción del tracto de salida, insuficiencia renal grave (FG <30), taquicardia ventricular",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 12.5,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "milrinona",
+      "nombreComercial": "MILRINONA",
+      "principioActivo": "Milrinona",
+      "categoria": "vasoactivo",
+      "presentacion": "1 amp 10 mL = 10 mg (1 mg/mL)",
+      "volFarmaco": 20,
+      "diluyente": "SG5% o SS0,9%",
+      "dosisTotalNum": 20,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "2 amp",
+      "volumenFinal": 50,
+      "dilucion": "2 amp (20 mg) + 30 mL SG5% o SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 400,
+        "unidad": "µg"
+      },
+      "bolo": "Carga (opcional, frecuentemente omitida por hipotensión): 50 µg/kg en 10 min",
+      "boloModos": [
+        {
+          "label": "Carga (50 µg/kg en 10 min)",
+          "porKg": 50,
+          "unidadBolo": "µg",
+          "conc": 1000,
+          "maxDosis": 6000
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.375,
+          "max": 0.75,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Ajustar en insuficiencia renal (eliminación renal, vida media prolongada).",
+      "alertas": [
+        "viacentral",
+        "bombaICC"
+      ],
+      "contraindicaciones": "Estenosis aórtica/pulmonar severa, IAM agudo",
+      "incompatibilidades": "Incompatible con furosemida en Y (precipita)",
+      "estado": "corregido",
+      "notaRevision": "AÑADIDA alerta 'bombaICC' e incompatibilidad en Y con furosemida.",
+      "ampollasBase": 2,
+      "dosisPorAmp": 10,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "nitroprusiato",
+      "nombreComercial": "NITROPRUSIATO SÓDICO",
+      "principioActivo": "Nitroprusiato sódico",
+      "categoria": "antihipertensivo",
+      "presentacion": "1 vial 5 mL = 50 mg",
+      "volFarmaco": 5,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 50,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 vial",
+      "volumenFinal": 50,
+      "dilucion": "1 vial (50 mg) + 45 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 1000,
+        "unidad": "µg"
+      },
+      "bolo": "No indicado",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.5,
+          "max": 10,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "Desechar a las 24 h. Desechar de inmediato si la solución vira a azul, verde o rojo oscuro.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "FOTOSENSIBLE: cubrir jeringa y línea con protector opaco. Riesgo de toxicidad por cianuro si >2 µg/kg/min prolongado o insuficiencia renal. Diluir SOLO en SG5%. Requiere monitorización arterial continua.",
+      "alertas": [
+        "luz",
+        "viacentral",
+        "bombaICC"
+      ],
+      "contraindicaciones": "Insuficiencia hepática grave, déficit de vitamina B12, atrofia óptica de Leber, hipotensión compensatoria",
+      "incompatibilidades": "No mezclar con ningún otro fármaco",
+      "estado": "corregido",
+      "notaRevision": "AÑADIDA alerta 'bombaICC'. Umbral de toxicidad por cianuro revisado a >2 µg/kg/min prolongado.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 50,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "labetalol",
+      "nombreComercial": "TRANDATE",
+      "principioActivo": "Labetalol",
+      "categoria": "antihipertensivo",
+      "presentacion": "1 amp 20 mL = 100 mg (5 mg/mL)",
+      "volFarmaco": 20,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 100,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (100 mg) + 30 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 2,
+        "unidad": "mg"
+      },
+      "bolo": "10–20 mg IV en 2 min. Repetir c/10 min. Máx. acumulado 300 mg.",
+      "boloModos": [
+        {
+          "label": "1.er bolo (10 mg, fijo)",
+          "fijo": 10,
+          "unidadBolo": "mg",
+          "conc": 5
+        },
+        {
+          "label": "Bolos siguientes (20 mg, fijo)",
+          "fijo": 20,
+          "unidadBolo": "mg",
+          "conc": 5
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.5,
+          "max": 2,
+          "unidad": "mg/min"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA, no depende del peso. La ampolla aporta 20 mL: añadir solo 30 mL de diluyente. Máximo acumulado 300 mg (bolos + perfusión).",
+      "alertas": [
+        "velocidad",
+        "bombaICC"
+      ],
+      "contraindicaciones": "Insuficiencia cardiaca descompensada / EAP, bloqueo AV >1.er grado, bradicardia, asma",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS alertas 'velocidad' (bolo en 2 min) y 'bombaICC'. Añadida calculadora de bolo.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 100,
+      "volPorAmp": 20,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "nitroglicerina",
+      "nombreComercial": "SOLINITRINA",
+      "principioActivo": "Nitroglicerina",
+      "categoria": "antihipertensivo",
+      "presentacion": "1 amp 5 mL = 5 mg (1 mg/mL)",
+      "volFarmaco": 5,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 5,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (5 mg) + 45 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 100,
+        "unidad": "µg"
+      },
+      "bolo": "No indicado",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 5,
+          "max": 200,
+          "unidad": "µg/min"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Solinitrina convencional (1 amp 5 mL = 5 mg). Dosis fija, no depende del peso. Usar sistema de PVC purgado o preferiblemente poliuretano.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": "Hipotensión, IAM de VD, estenosis aórtica severa, uso de sildenafilo/tadalafilo en 24–48 h",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 5,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "urapidilo",
+      "nombreComercial": "ELGADIL",
+      "principioActivo": "Urapidilo",
+      "categoria": "antihipertensivo",
+      "presentacion": "1 amp 10 mL = 50 mg (5 mg/mL)",
+      "volFarmaco": 10,
+      "diluyente": "SS0,9% o SG5%",
+      "dosisTotalNum": 50,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (50 mg) + 40 mL SS0,9% o SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 1,
+        "unidad": "mg"
+      },
+      "bolo": "1.º: 25 mg en 20 s. 2.º: 25 mg a los 5 min. 3.º: 50 mg a los 5 min. (Bolos con ampolla SIN diluir.)",
+      "boloModos": [
+        {
+          "label": "1.er bolo",
+          "fijo": 25,
+          "unidadBolo": "mg",
+          "conc": 5
+        },
+        {
+          "label": "2.º bolo (si no respuesta)",
+          "fijo": 25,
+          "unidadBolo": "mg",
+          "conc": 5
+        },
+        {
+          "label": "3.er bolo (si no respuesta)",
+          "fijo": 50,
+          "unidadBolo": "mg",
+          "conc": 5
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 9,
+          "max": 30,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA, no depende del peso. No produce taquicardia refleja significativa.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": "Estenosis aórtica",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDA alerta 'bombaICC'.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 50,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "amiodarona",
+      "nombreComercial": "TRANGOREX",
+      "principioActivo": "Amiodarona",
+      "categoria": "antiarritmico",
+      "presentacion": "1 amp 3 mL = 150 mg (50 mg/mL)",
+      "volFarmaco": 6,
+      "diluyente": "SG5%",
+      "dosisTotalNum": 300,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "2 amp",
+      "volumenFinal": 50,
+      "dilucion": "2 amp (300 mg) + 44 mL SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 6,
+        "unidad": "mg"
+      },
+      "bolo": "PCR: 300 mg IV directo. Carga (no PCR): 300 mg en 100 mL SG5% en 20–30 min.",
+      "boloModos": [
+        {
+          "label": "PCR (300 mg, fijo)",
+          "fijo": 300,
+          "unidadBolo": "mg",
+          "conc": 50
+        },
+        {
+          "label": "2.ª dosis PCR (150 mg, fijo)",
+          "fijo": 150,
+          "unidadBolo": "mg",
+          "conc": 50
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Carga (primeras 6 h)",
+          "min": 1,
+          "max": 1,
+          "unidad": "mg/min"
+        },
+        {
+          "nombre": "Mantenimiento (18 h siguientes)",
+          "min": 0.5,
+          "max": 0.5,
+          "unidad": "mg/min"
+        },
+        {
+          "nombre": "900 mg/24 h (ritmo constante)",
+          "min": 37.5,
+          "max": 37.5,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h en SG5%. NO usar SS0,9%.",
+      "concMaxPeriferica": "2 mg/mL por vía periférica (esta dilución, a 6 mg/mL, exige vía central)",
+      "referencia": null,
+      "observaciones": "Pauta clásica 900 mg/24 h = 1 mg/min × 6 h (10 mL/h) + 0,5 mg/min × 18 h (5 mL/h). Alternativa a ritmo constante: 37,5 mg/h = 6,3 mL/h (la jeringa dura 8 h; 3 jeringas en 24 h). Diluir SOLO en SG5%. Flebitis frecuente por vía periférica.",
+      "alertas": [
+        "viacentral",
+        "bombaICC",
+        "modosAlternativos"
+      ],
+      "contraindicaciones": "Hipersensibilidad al yodo, bloqueo sinoauricular, bradicardia severa, QT largo",
+      "incompatibilidades": "INCOMPATIBLE CON SS 0,9% — usar SOLO SG5%",
+      "estado": "corregido",
+      "notaRevision": "AÑADIDO el modo de carga (1 mg/min × 6 h), que el dataset original describía solo en texto libre. Los dos modos son SECUENCIALES, no simultáneos.",
+      "ampollasBase": 2,
+      "dosisPorAmp": 150,
+      "volPorAmp": 3,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "esmolol",
+      "nombreComercial": "BREVIBLOC",
+      "principioActivo": "Esmolol",
+      "categoria": "antiarritmico",
+      "presentacion": "1 vial 10 mL = 100 mg (10 mg/mL)",
+      "volFarmaco": 20,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 200,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "2 viales",
+      "volumenFinal": 50,
+      "dilucion": "2 viales (200 mg) + 30 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 4000,
+        "unidad": "µg"
+      },
+      "bolo": "Carga: 500 µg/kg en 1 min",
+      "boloModos": [
+        {
+          "label": "Carga (500 µg/kg en 1 min)",
+          "porKg": 500,
+          "unidadBolo": "µg",
+          "conc": 10000,
+          "maxDosis": 60000
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 50,
+          "max": 200,
+          "unidad": "µg/kg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": "10 mg/mL",
+      "referencia": null,
+      "observaciones": "ATENCIÓN: a 200 µg/kg/min esta dilución exige 210 mL/h en un paciente de 70 kg (jeringa agotada en 14 min). Para dosis >100 µg/kg/min cargar el vial SIN DILUIR (10 mg/mL) en la jeringa. Vida media ~9 min.",
+      "alertas": [
+        "bombaICC",
+        "velocidad"
+      ],
+      "contraindicaciones": "Bradicardia, bloqueo AV 2.º–3.er grado, asma activa, IC descompensada, shock cardiogénico",
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 2,
+      "dosisPorAmp": 100,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "lidocaina",
+      "nombreComercial": "LIDOCAÍNA 1 % IV",
+      "principioActivo": "Lidocaína 1 %",
+      "categoria": "antiarritmico",
+      "presentacion": "1 amp 10 mL al 1 % = 100 mg (10 mg/mL)",
+      "volFarmaco": 20,
+      "diluyente": "SG5% o SS0,9%",
+      "dosisTotalNum": 200,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "2 amp al 1 %",
+      "volumenFinal": 50,
+      "dilucion": "2 amp al 1 % (200 mg) + 30 mL SG5% o SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 4,
+        "unidad": "mg"
+      },
+      "bolo": "Carga: 1–1,5 mg/kg IV en 2–3 min",
+      "boloModos": [
+        {
+          "label": "Carga (1 mg/kg)",
+          "porKg": 1,
+          "unidadBolo": "mg",
+          "conc": 10,
+          "maxDosis": 100
+        },
+        {
+          "label": "Carga alta (1,5 mg/kg)",
+          "porKg": 1.5,
+          "unidadBolo": "mg",
+          "conc": 10,
+          "maxDosis": 150
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 1,
+          "max": 4,
+          "unidad": "mg/min"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "COMPROBAR EL % DE LA AMPOLLA: esta receta es para lidocaína al 1 % (10 mg/mL). Al 2 % (20 mg/mL) cargar la mitad de volumen; al 5 % (50 mg/mL), la quinta parte. Nunca contar por ampollas sin mirar el %. Solo lidocaína SIN adrenalina. Perfusión en DOSIS FIJA. Monitorización ECG continua. Reducir en hepatopatía e IC. Toxicidad: parestesias periorales, acúfenos, convulsiones.",
+      "alertas": [
+        "bombaICC",
+        "velocidad"
+      ],
+      "contraindicaciones": "Bloqueo AV completo, hipersensibilidad a anestésicos tipo amida",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS calculadora de bolo y alertas 'bombaICC' y 'velocidad'.",
+      "ampollasBase": 2,
+      "dosisPorAmp": 100,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp",
+      "envaseTxt": "amp al 1 %"
+    },
+    {
+      "id": "diltiazem",
+      "nombreComercial": "MASDIL",
+      "principioActivo": "Diltiazem",
+      "categoria": "antiarritmico",
+      "presentacion": "1 vial polvo = 25 mg",
+      "polvo": true,
+      "volFarmaco": 0,
+      "diluyente": "SS0,9% o SG5%",
+      "dosisTotalNum": 50,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "2 viales",
+      "volumenFinal": 50,
+      "dilucion": "2 viales (50 mg) — reconstituir y COMPLETAR HASTA 50 mL con SS0,9% o SG5% (volumen final 50 mL)",
+      "conc": {
+        "valor": 1,
+        "unidad": "mg"
+      },
+      "bolo": "0,25 mg/kg IV en 2 min. Si no respuesta: 0,35 mg/kg a los 15 min.",
+      "boloModos": [
+        {
+          "label": "1.er bolo (0,25 mg/kg en 2 min)",
+          "porKg": 0.25,
+          "unidadBolo": "mg",
+          "conc": 5,
+          "maxDosis": 25
+        },
+        {
+          "label": "2.º bolo (0,35 mg/kg a los 15 min)",
+          "porKg": 0.35,
+          "unidadBolo": "mg",
+          "conc": 5,
+          "maxDosis": 35
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 5,
+          "max": 15,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la reconstitución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Perfusión en DOSIS FIJA. Monitorizar FC y PA. Bolo reconstituido a 5 mg/mL (1 vial de 25 mg en 5 mL).",
+      "alertas": [
+        "bombaICC",
+        "velocidad"
+      ],
+      "contraindicaciones": "Bloqueo AV 2.º–3.er grado, disfunción sinusal, FA preexcitada (WPW), IC sistólica grave, hipotensión",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS calculadora de bolo con topes y alertas 'bombaICC' y 'velocidad'.",
+      "ampollasBase": 2,
+      "dosisPorAmp": 25,
+      "volPorAmp": 0,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "fenitoina",
+      "nombreComercial": "FENITOÍNA",
+      "principioActivo": "Fenitoína",
+      "categoria": "antiepilepsico",
+      "presentacion": "1 vial 5 mL = 250 mg (50 mg/mL)",
+      "puro": true,
+      "volFarmaco": 5,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 250,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 vial",
+      "volumenFinal": 5,
+      "dilucion": "CARGA EN BOLO DILUIDO: dosis calculada en 50–100 mL de SS0,9%, a pasar en ≥20 min. NO se usa en perfusión continua en esta guía.",
+      "conc": {
+        "valor": 50,
+        "unidad": "mg"
+      },
+      "bolo": "Carga: 15–20 mg/kg IV. VELOCIDAD MÁXIMA 50 mg/min (25 mg/min en ancianos/cardiópatas). Máx. 1.500 mg.",
+      "boloModos": [
+        {
+          "label": "Carga (18 mg/kg)",
+          "porKg": 18,
+          "unidadBolo": "mg",
+          "conc": 50,
+          "maxDosis": 1500
+        }
+      ],
+      "modos": [],
+      "pesoDosificacion": "real",
+      "estabilidad": "Administrar de inmediato tras la dilución. Riesgo de precipitación si permanece >1 h en el sistema. Inspeccionar visualmente antes de administrar.",
+      "concMaxPeriferica": "No exceder 10 mg/mL en la dilución de carga",
+      "referencia": null,
+      "observaciones": "SOLO SS0,9%. NUNCA SG5% (precipita). Monitorización ECG y PA continuas durante la carga. Usar filtro de 0,22 µm si está disponible. Riesgo de síndrome del guante púrpura por extravasación.",
+      "alertas": [
+        "velocidad"
+      ],
+      "contraindicaciones": "Bloqueo AV 2.º–3.er grado, bradicardia sinusal, síndrome de Adams-Stokes",
+      "incompatibilidades": "NUNCA con SG5% — precipita. No mezclar con ningún otro fármaco.",
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 250,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "valproato",
+      "nombreComercial": "DEPAKINE",
+      "principioActivo": "Valproato sódico",
+      "categoria": "antiepilepsico",
+      "polvo": true,
+      "volFarmaco": 0,
+      "diluyente": "SS0,9% o SG5%",
+      "dosisTotalNum": 400,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 vial",
+      "presentacion": "1 vial polvo = 400 mg",
+      "volumenFinal": 50,
+      "dilucion": "1 vial (400 mg) — reconstituir y COMPLETAR HASTA 50 mL con SS0,9% o SG5% (volumen final 50 mL)",
+      "conc": {
+        "valor": 8,
+        "unidad": "mg"
+      },
+      "bolo": "Carga: 20–25 mg/kg en 30 min (máx. 6 mg/kg/min). Máx. 3.000 mg.",
+      "boloModos": [
+        {
+          "label": "Carga (25 mg/kg en 30 min)",
+          "porKg": 25,
+          "unidadBolo": "mg",
+          "conc": 100,
+          "maxDosis": 3000
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Mantenimiento",
+          "min": 1,
+          "max": 2,
+          "unidad": "mg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la reconstitución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Bolo reconstituido a 100 mg/mL (vial de 400 mg en 4 mL). Vigilar hiperamoniemia.",
+      "alertas": [
+        "velocidad"
+      ],
+      "contraindicaciones": "Hepatopatía activa, trastornos mitocondriales (POLG), embarazo, pancreatitis",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDA calculadora de bolo con tope de 3.000 mg y alerta 'velocidad'.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 400,
+      "volPorAmp": 4,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "heparina",
+      "nombreComercial": "HEPARINA SÓDICA",
+      "principioActivo": "Heparina sódica",
+      "categoria": "anticoagulante",
+      "presentacion": "1 vial 5 mL = 25.000 UI (5.000 UI/mL)",
+      "volFarmaco": 5,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 25000,
+      "dosisTotalUnidad": "UI",
+      "nAmp": "1 vial",
+      "volumenFinal": 50,
+      "dilucion": "1 vial (25.000 UI) + 45 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 500,
+        "unidad": "UI"
+      },
+      "bolo": "80 UI/kg IV. MÁXIMO 5.000 UI (según protocolo local).",
+      "boloModos": [
+        {
+          "label": "Bolo (80 UI/kg, máx. 5.000 UI)",
+          "porKg": 80,
+          "unidadBolo": "UI",
+          "conc": 5000,
+          "maxDosis": 5000
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión (ajustar por TTPa)",
+          "min": 500,
+          "max": 2500,
+          "unidad": "UI/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "REQUIERE CONTROL DE TTPa PARA AJUSTAR DOSIS. Inicio habitual 18 UI/kg/h (≈1.000–1.300 UI/h en adulto medio) = 2–2,6 mL/h. Nunca ajustar a ciegas. Antídoto: sulfato de protamina.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": "Hemorragia activa, trombocitopenia inducida por heparina (TIH), hemorragia intracraneal, cirugía reciente del SNC",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "DOS CORRECCIONES: (1) el bolo llevaba 80 UI/kg SIN TOPE, superando su propio máximo declarado de 5.000 UI a partir de 62,5 kg (9.600 UI a 120 kg). Añadido maxDosis. (2) La perfusión era un punto fijo de 1.000 UI/h; ampliada a 500–2.500 UI/h para permitir la titulación por TTPa.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 25000,
+      "volPorAmp": 5,
+      "unidadPorAmp": "UI",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "tranexamico",
+      "nombreComercial": "AMCHAFIBRIN",
+      "principioActivo": "Ácido tranexámico",
+      "categoria": "antifibrinolitico",
+      "presentacion": "1 amp 5 mL = 500 mg (100 mg/mL)",
+      "volFarmaco": 10,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 1000,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "2 amp",
+      "volumenFinal": 50,
+      "dilucion": "2 amp (1.000 mg) + 40 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 20,
+        "unidad": "mg"
+      },
+      "bolo": "1 g IV en 10 min (NUNCA en bolo rápido: hipotensión). Iniciar SIEMPRE en las primeras 3 h del traumatismo.",
+      "boloModos": [
+        {
+          "label": "Carga (1 g en 10 min, fijo)",
+          "fijo": 1000,
+          "unidadBolo": "mg",
+          "conc": 100
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Mantenimiento",
+          "min": 125,
+          "max": 125,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "PROTOCOLO DE HEMORRAGIA MASIVA. 1 g en 8 h = 125 mg/h = 6,25 mL/h. NO es un anticoagulante: es un antifibrinolítico. Pasadas 3 h del trauma puede ser perjudicial (CRASH-2).",
+      "alertas": [
+        "velocidad",
+        "bombaICC"
+      ],
+      "contraindicaciones": "Trombosis activa, antecedente de convulsiones con tranexámico, inyección intratecal",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS calculadora de bolo y alertas 'velocidad' (hipotensión con bolo rápido) y 'bombaICC'.",
+      "ampollasBase": 2,
+      "dosisPorAmp": 500,
+      "volPorAmp": 5,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "insulina",
+      "nombreComercial": "ACTRAPID / HUMULINA REGULAR",
+      "principioActivo": "Insulina regular (soluble)",
+      "categoria": "metabolico",
+      "presentacion": "Vial multidosis 10 mL = 1.000 UI (100 UI/mL)",
+      "volFarmaco": 0.5,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 50,
+      "dosisTotalUnidad": "UI",
+      "nAmp": "50 UI (0,5 mL del vial)",
+      "volumenFinal": 50,
+      "dilucion": "50 UI (0,5 mL del vial, medidas con jeringa de insulina) + 49,5 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 1,
+        "unidad": "UI"
+      },
+      "bolo": "No recomendado de rutina en CAD (protocolos actuales inician directamente la perfusión).",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "CAD / EHH (por peso)",
+          "min": 0.05,
+          "max": 0.1,
+          "unidad": "UI/kg/h"
+        },
+        {
+          "nombre": "Dosis fija",
+          "min": 1,
+          "max": 6,
+          "unidad": "UI/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución. Conservar viales en nevera.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "SOLO insulina regular (Actrapid o Humulina Regular). NUNCA NPH ni mezclas por vía IV. El vial contiene 1.000 UI: se usan solo 50 UI. Purgar la línea con la propia dilución antes de conectar (la insulina se adsorbe al plástico). Titular según glucemia horaria. Los dos modos son ALTERNATIVOS. Vigilar potasio: NO iniciar insulina si K+ <3,3 mEq/L.",
+      "alertas": [
+        "bombaICC",
+        "frio",
+        "modosAlternativos"
+      ],
+      "contraindicaciones": "Hipoglucemia, hipopotasemia <3,3 mEq/L",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDO el modo por peso (0,05–0,1 UI/kg/h): el rango original de 1–6 UI/h NO cubría el protocolo de CAD (0,1 UI/kg/h = 7 UI/h en un adulto de 70 kg). Añadida advertencia sobre el potasio."
+    },
+    {
+      "id": "furosemida",
+      "nombreComercial": "SEGURIL",
+      "principioActivo": "Furosemida",
+      "categoria": "diuretico",
+      "presentacion": "1 amp 2 mL = 20 mg (10 mg/mL)",
+      "volFarmaco": 10,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 100,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "5 amp",
+      "volumenFinal": 50,
+      "dilucion": "5 amp (100 mg) + 40 mL SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 2,
+        "unidad": "mg"
+      },
+      "bolo": "20–80 mg IV lento. VELOCIDAD MÁXIMA 4 mg/min (riesgo de ototoxicidad).",
+      "boloModos": [
+        {
+          "label": "Bolo estándar (40 mg, fijo)",
+          "fijo": 40,
+          "unidadBolo": "mg",
+          "conc": 10
+        },
+        {
+          "label": "Bolo alto (80 mg, fijo)",
+          "fijo": 80,
+          "unidadBolo": "mg",
+          "conc": 10
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 5,
+          "max": 20,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente. FOTOSENSIBLE: proteger de la luz. Desechar si la solución está amarillenta.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA. Inicio habitual 10 mg/h = 5 mL/h. Titular según diuresis. NO diluir en SG5% (pH ácido). Vigilar potasio. ATENCIÓN EN TRASLADOS: la jeringa hospitalaria habitual es de 250 mg/50 mL (5 mg/mL); con esa, 10 mg/h = 2 mL/h. Comprobar siempre la concentración de la jeringa que trae el paciente antes de programar el ritmo.",
+      "alertas": [
+        "velocidad",
+        "luz",
+        "bombaICC"
+      ],
+      "contraindicaciones": "Hipovolemia, anuria, hipopotasemia grave, alergia a sulfamidas",
+      "incompatibilidades": "Incompatible con SG5% y soluciones ácidas. Incompatible en Y con milrinona.",
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS alertas 'velocidad' (máx. 4 mg/min), 'luz' (fotosensible) y 'bombaICC', todas ausentes en el dataset original. Añadida calculadora de bolo.",
+      "ampollasBase": 5,
+      "dosisPorAmp": 20,
+      "volPorAmp": 2,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "omeprazol",
+      "nombreComercial": "LOSEC / NEXIUM",
+      "principioActivo": "Omeprazol / Esomeprazol",
+      "categoria": "digestivo",
+      "polvo": true,
+      "volFarmaco": 0,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 120,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "3 viales",
+      "presentacion": "1 vial polvo = 40 mg",
+      "volumenFinal": 50,
+      "dilucion": "3 viales (120 mg) — reconstituir y COMPLETAR HASTA 50 mL con SS0,9% (volumen final 50 mL)",
+      "conc": {
+        "valor": 2.4,
+        "unidad": "mg"
+      },
+      "bolo": "80 mg IV en 30 min (HDA activa)",
+      "boloModos": [
+        {
+          "label": "Carga HDA (80 mg en 30 min, fijo)",
+          "fijo": 80,
+          "unidadBolo": "mg",
+          "conc": 4
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 8,
+          "max": 8,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "Administrar en las 12 h siguientes a la reconstitución (SS0,9%). Desechar si vira a pardo.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA. Indicación: hemorragia digestiva alta tras bolo de carga. 8 mg/h × 72 h. A 3,33 mL/h la jeringa de 50 mL dura 15 h: prever recambios.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": "No mezclar con otros fármacos",
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS calculadora de bolo, alerta 'bombaICC' y estabilidad (12 h, no 24 h).",
+      "ampollasBase": 3,
+      "dosisPorAmp": 40,
+      "volPorAmp": 0,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial"
+    },
+    {
+      "id": "flumazenilo",
+      "nombreComercial": "ANEXATE",
+      "principioActivo": "Flumazenilo",
+      "categoria": "revertidor",
+      "presentacion": "1 amp 10 mL = 1 mg (0,1 mg/mL)",
+      "volFarmaco": 10,
+      "diluyente": "SS0,9% o SG5%",
+      "dosisTotalNum": 1,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (1 mg) + 40 mL SS0,9% o SG5% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 20,
+        "unidad": "µg"
+      },
+      "bolo": "0,2 mg IV en 15 s. Repetir c/1 min hasta 1 mg total.",
+      "boloModos": [
+        {
+          "label": "Bolo (0,2 mg, fijo)",
+          "fijo": 0.2,
+          "unidadBolo": "mg",
+          "conc": 0.1
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 0.1,
+          "max": 0.4,
+          "unidad": "mg/h"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA. Vida media ~1 h: vigilar re-sedación. NO usar a ciegas en intoxicación por fármacos desconocidos.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": "Dependencia crónica a BZD (precipita abstinencia), intoxicación por antidepresivos tricíclicos (riesgo de convulsiones), epilepsia en tratamiento con BZD",
+      "incompatibilidades": null,
+      "estado": "corregido",
+      "notaRevision": "AÑADIDAS calculadora de bolo y alerta 'bombaICC'.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 1,
+      "volPorAmp": 10,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "naloxona",
+      "nombreComercial": "NALOXONA",
+      "principioActivo": "Naloxona",
+      "categoria": "revertidor",
+      "presentacion": "1 amp 1 mL = 0,4 mg",
+      "volFarmaco": 1,
+      "diluyente": "SG5% o SS0,9%",
+      "dosisTotalNum": 400,
+      "dosisTotalUnidad": "µg",
+      "nAmp": "1 amp",
+      "volumenFinal": 50,
+      "dilucion": "1 amp (0,4 mg / 400 µg) + 49 mL SG5% o SS0,9% → VOLUMEN FINAL 50 mL",
+      "conc": {
+        "valor": 8,
+        "unidad": "µg"
+      },
+      "bolo": "0,04–0,4 mg IV, titulando. Repetir c/2–3 min. Objetivo: ventilación eficaz, NO despertar completo.",
+      "boloModos": [
+        {
+          "label": "Bolo titulado (0,04 mg, fijo)",
+          "fijo": 0.04,
+          "unidadBolo": "mg",
+          "conc": 0.4
+        },
+        {
+          "label": "Bolo estándar (0,4 mg, fijo)",
+          "fijo": 0.4,
+          "unidadBolo": "mg",
+          "conc": 0.4
+        }
+      ],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 2,
+          "max": 10,
+          "unidad": "µg/kg/h"
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "24 h a temperatura ambiente tras la dilución.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Vida media 60–90 min (más corta que la de muchos opioides): vigilar re-narcotización. En dependientes, la reversión brusca precipita abstinencia y agitación: titular. Regla habitual de perfusión: 2/3 de la dosis de bolo eficaz por hora.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "ok",
+      "notaRevision": null,
+      "ampollasBase": 1,
+      "dosisPorAmp": 400,
+      "volPorAmp": 1,
+      "unidadPorAmp": "µg",
+      "tipoEnvase": "amp"
+    },
+    {
+      "id": "somatostatina",
+      "nombreComercial": "SOMATOSTATINA",
+      "principioActivo": "Somatostatina",
+      "categoria": "digestivo",
+      "presentacion": "1 vial polvo = 3 mg",
+      "polvo": true,
+      "volFarmaco": 0,
+      "diluyente": "SS0,9%",
+      "dosisTotalNum": 3,
+      "dosisTotalUnidad": "mg",
+      "nAmp": "1 vial",
+      "volumenFinal": 50,
+      "dilucion": "1 vial (3 mg) — reconstituir y COMPLETAR HASTA 50 mL con SS0,9%",
+      "conc": {
+        "valor": 60,
+        "unidad": "µg"
+      },
+      "bolo": "250 µg IV lento (en ≥3 min) al iniciar la perfusión",
+      "boloModos": [],
+      "modos": [
+        {
+          "nombre": "Perfusión",
+          "min": 250,
+          "max": 250,
+          "unidad": "µg/h"
+        }
+      ],
+      "pesoDosificacion": "no_aplica",
+      "estabilidad": "Pendiente de confirmar por Farmacia.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Dosis FIJA: 250 µg/h = 4,2 mL/h (la jeringa dura 12 h). Indicación: hemorragia digestiva alta por varices. Vida media 1–3 min: NO interrumpir la perfusión; si se interrumpe más de 3–5 min, repetir el bolo. Vigilar glucemia.",
+      "alertas": [
+        "bombaICC"
+      ],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "revisar",
+      "notaRevision": "Añadido en v2.1.0 a petición de usuarios de prueba. Pendiente de validación por Farmacia.",
+      "ampollasBase": 1,
+      "dosisPorAmp": 3,
+      "volPorAmp": 0,
+      "unidadPorAmp": "mg",
+      "tipoEnvase": "vial",
+      "maxAmpollas": 2
+    },
+    {
+      "id": "acetilcisteina",
+      "nombreComercial": "HIDONAC ANTÍDOTO 20 %",
+      "principioActivo": "Acetilcisteína (NAC)",
+      "categoria": "revertidor",
+      "tipo": "gravedad",
+      "presentacion": "1 vial 25 mL = 5 g (200 mg/mL)",
+      "puro": true,
+      "volFarmaco": 0,
+      "diluyente": "SG5%",
+      "dosisTotalNum": null,
+      "dosisTotalUnidad": null,
+      "nAmp": "Según peso",
+      "volumenFinal": 0,
+      "dilucion": "EN SUERO POR GRAVEDAD — no cabe en perfusor de jeringa de 50 mL. Ver calculadora por fases.",
+      "conc": {
+        "valor": 200,
+        "unidad": "mg"
+      },
+      "bolo": null,
+      "boloModos": [],
+      "modos": [],
+      "pesoMaxCalculo": 110,
+      "volVial": 25,
+      "gotasPorMl": 20,
+      "fases": [
+        {
+          "nombre": "1.ª fase",
+          "mgKg": 150,
+          "suero": 200,
+          "minutos": 60
+        },
+        {
+          "nombre": "2.ª fase",
+          "mgKg": 50,
+          "suero": 500,
+          "minutos": 240
+        },
+        {
+          "nombre": "3.ª fase",
+          "mgKg": 100,
+          "suero": 1000,
+          "minutos": 960
+        }
+      ],
+      "pesoDosificacion": "real",
+      "estabilidad": "Pendiente de confirmar por Farmacia.",
+      "concMaxPeriferica": null,
+      "referencia": null,
+      "observaciones": "Intoxicación por paracetamol. Pauta clásica de 3 fases: 300 mg/kg en 21 h. Peso máximo de cálculo: 110 kg. Reacciones anafilactoides sobre todo en la 1.ª fase: parar, tratar y reanudar más lento. La ficha técnica clásica pasa la 1.ª fase en 15 min; aquí se indica en 60 min para reducir reacciones.",
+      "alertas": [],
+      "contraindicaciones": null,
+      "incompatibilidades": null,
+      "estado": "revisar",
+      "notaRevision": "Añadido en v2.1.0. Confirmar presentación (5 g/25 mL) y pauta con Farmacia."
+    }
+  ]
+};

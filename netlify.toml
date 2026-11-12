@@ -1,9 +1,5 @@
 [build]
   publish = "."
-  functions = "netlify/functions"
-
-[functions]
-  included_files = ["farmacos.json"]
 
 [[headers]]
   for = "/*"

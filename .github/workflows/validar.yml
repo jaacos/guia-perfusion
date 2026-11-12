@@ -1,0 +1,8 @@
+name: Validar farmacos.json
+on: [push, pull_request]
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tests/validar_farmacos.py

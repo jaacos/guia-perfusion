@@ -1,5 +1,27 @@
 # Guía Rápida de Perfusión — Registro de correcciones
 
+## v2.1.0-borrador (12/11/2026) — feedback de usuarios de prueba
+
+**Todo lo clínico sigue pendiente de validación por Farmacia.**
+
+- **Título por principio activo.** Fichas y orden por principio activo; el comercial pasa a secundario. La búsqueda sigue funcionando por ambos.
+- **Chat de Gemini eliminado** (botón, panel, función `netlify/functions/gemini.js` y su configuración). La app ya no hace ninguna llamada externa.
+- **Solo adulto.** La calculadora no calcula por debajo de 40 kg y remite a la guía pediátrica. El peso se conserva al cambiar de ficha y es único dentro de cada ficha (bolo y perfusión).
+- **Duración de la jeringa** visible en todas las calculadoras de perfusión.
+- **Versión y fecha de revisión de datos** visibles en la cabecera, más aviso de borrador.
+- **Presentaciones.** Nuevo campo `otrasPresentaciones`; la ficha distingue la «presentación usada» en la receta. Midazolam: añadida la ampolla de 5 mg/5 mL.
+- **Lidocaína:** receta explícita al 1 % y aviso para ampollas al 2 % y 5 %.
+- **Furosemida:** se mantiene 100 mg/50 mL (dotación: solo ampollas de 20 mg). Aviso de que la jeringa hospitalaria habitual es de 250 mg/50 mL. Categoría «Diurético».
+- **Amiodarona:** segundo modo «900 mg/24 h» (37,5 mg/h = 6,25 mL/h) con la misma jeringa.
+- **Insulina:** «50 UI (0,5 mL del vial, con jeringa de insulina)», Actrapid / Humulina Regular, aviso «nunca NPH ni mezclas IV». Retirada la indicación de purgar 20 mL.
+- **Esmolol:** eliminada la referencia a bomba volumétrica (no hay en la dotación).
+- **Nuevos:** Somatostatina (3 mg/50 mL) y Acetilcisteína — Hidonac Antídoto, como ficha «por gravedad» con calculadora por fases (no cabe en jeringa de 50 mL).
+- **Test automático** `tests/validar_farmacos.py`: recalcula concentraciones, recetas y ritmos de los 39 fármacos. Se ejecuta solo en GitHub en cada cambio (`.github/workflows/validar.yml`).
+
+---
+
+## v2.0.0 — revisión técnica
+
 Revisión técnica del código y validación de cálculos de dosificación y dilución.
 **Todo lo clínico de este documento requiere validación por Farmacia Hospitalaria / comisión correspondiente antes de uso asistencial oficial.**
 

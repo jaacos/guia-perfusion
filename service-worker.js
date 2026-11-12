@@ -4,7 +4,7 @@
 //  cache-first para estáticos. Elimina la necesidad de bumpear la versión a mano
 //  cada vez que se corrige un fármaco.
 // ═══════════════════════════════════════════════════════════════════════════════
-const CACHE_NAME = 'guia-perfusion-v10';
+const CACHE_NAME = 'guia-perfusion-v11';
 
 const PRECACHE = [
   './',
@@ -33,10 +33,9 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const req = event.request;
-  if (req.method !== 'GET') return;                       // el POST del chat no se cachea
+  if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  if (url.pathname.startsWith('/.netlify/')) return;      // nunca cachear la función Gemini
 
   const esFresco = req.mode === 'navigate' ||
                    FRESCOS.some(p => url.pathname === p || url.pathname.endsWith(p));

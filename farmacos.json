@@ -2,7 +2,7 @@
   {
     "id": "propofol1",
     "nombreComercial": "DIPRIVAN 1%",
-    "principioActivo": "Propofol",
+    "principioActivo": "Propofol 1 %",
     "categoria": "sedacion",
     "presentacion": "Vial 20 mL = 200 mg (10 mg/mL)",
     "volFarmaco": null,
@@ -30,7 +30,7 @@
   {
     "id": "propofol2",
     "nombreComercial": "DIPRIVAN 2%",
-    "principioActivo": "Propofol",
+    "principioActivo": "Propofol 2 %",
     "categoria": "sedacion",
     "presentacion": "Vial 20 mL = 400 mg (20 mg/mL)",
     "volFarmaco": null,
@@ -83,7 +83,10 @@
     "alertas": [],
     "contraindicaciones": null,
     "incompatibilidades": null,
-    "dilucion": "3 amp de 15 mg (45 mg) + 41 mL SS0,9% → VOLUMEN FINAL 50 mL"
+    "dilucion": "3 amp de 15 mg (45 mg) + 41 mL SS0,9% → VOLUMEN FINAL 50 mL",
+    "otrasPresentaciones": [
+      "1 amp 5 mL = 5 mg (1 mg/mL) — para bolos; NO usar para esta receta"
+    ]
   },
   {
     "id": "ketamina",
@@ -539,7 +542,7 @@
   {
     "id": "vasopresina",
     "nombreComercial": "VASOPRESINA",
-    "principioActivo": "Vasopresina / ADH",
+    "principioActivo": "Vasopresina",
     "categoria": "vasoactivo",
     "presentacion": "1 amp 1 mL = 20 UI",
     "volFarmaco": 5,
@@ -822,13 +825,19 @@
     "bolo": "PCR: 300 mg IV directo. Carga (no PCR): 300 mg en 100 mL SG5% en 20–30 min.",
     "modos": [
       {
-        "nombre": "Mantenimiento",
+        "nombre": "0,5 mg/min",
         "min": 0.5,
         "max": 0.5,
         "unidad": "mg/min"
+      },
+      {
+        "nombre": "900 mg/24 h",
+        "min": 37.5,
+        "max": 37.5,
+        "unidad": "mg/h"
       }
     ],
-    "observaciones": "0,5 mg/min = 5 mL/h = 720 mg/24 h. La pauta clásica de 900 mg/24 h corresponde a 1 mg/min × 6 h + 0,5 mg/min × 18 h. Diluir SOLO en SG5%.",
+    "observaciones": "0,5 mg/min = 5 mL/h = 720 mg/24 h (la jeringa dura 10 h). 900 mg/24 h = 37,5 mg/h = 6,25 mL/h (la jeringa dura 8 h; 3 jeringas en 24 h). Son pautas alternativas, NO acumulables. Diluir SOLO en SG5%.",
     "alertas": [
       "viacentral"
     ],
@@ -860,7 +869,7 @@
         "unidad": "µg/kg/min"
       }
     ],
-    "observaciones": "ATENCIÓN: a dosis altas esta dilución exige >200 mL/h (jeringa agotada en <15 min). Para dosis >150 µg/kg/min usar vial sin diluir (10 mg/mL) o bomba volumétrica. Vida media ~9 min.",
+    "observaciones": "ATENCIÓN: a dosis altas esta dilución exige >200 mL/h (jeringa agotada en <15 min). Para dosis >150 µg/kg/min cargar el vial SIN DILUIR (10 mg/mL) en la jeringa. Vida media ~9 min.",
     "alertas": [],
     "contraindicaciones": "Bradicardia, bloqueo AV 2.º–3.er grado, asma activa, IC descompensada",
     "incompatibilidades": null,
@@ -868,14 +877,14 @@
   },
   {
     "id": "lidocaina",
-    "nombreComercial": "LIDOCAÍNA IV",
-    "principioActivo": "Lidocaína",
+    "nombreComercial": "LIDOCAÍNA 1 % IV",
+    "principioActivo": "Lidocaína 1 %",
     "categoria": "antiarritmico",
-    "presentacion": "1 amp 10 mL = 100 mg (10 mg/mL)",
+    "presentacion": "1 amp 10 mL al 1 % = 100 mg (10 mg/mL)",
     "volFarmaco": 20,
     "diluyente": "SG5% o SS0,9%",
     "dosisTotal": "200 mg",
-    "nAmp": "2 amp",
+    "nAmp": "2 amp al 1 %",
     "conc": {
       "valor": 4,
       "unidad": "mg"
@@ -890,11 +899,11 @@
         "unidad": "mg/min"
       }
     ],
-    "observaciones": "Dosis fija. Monitorización ECG continua. Reducir en hepatopatía e IC.",
+    "observaciones": "COMPROBAR EL % DE LA AMPOLLA: esta receta es para lidocaína al 1 % (10 mg/mL). Al 2 % (20 mg/mL) cargar 10 mL; al 5 % (50 mg/mL) cargar 4 mL. Nunca contar por ampollas sin mirar el %. Solo lidocaína SIN adrenalina. Dosis fija. Monitorización ECG continua. Reducir en hepatopatía e IC.",
     "alertas": [],
     "contraindicaciones": "Bloqueo AV completo, hipersensibilidad a anestésicos tipo amida",
     "incompatibilidades": null,
-    "dilucion": "2 amp (200 mg) + 30 mL SG5% o SS0,9% → VOLUMEN FINAL 50 mL"
+    "dilucion": "2 amp al 1 % (20 mL = 200 mg) + 30 mL SG5% o SS0,9% → VOLUMEN FINAL 50 mL"
   },
   {
     "id": "diltiazem",
@@ -1060,14 +1069,14 @@
   },
   {
     "id": "insulina",
-    "nombreComercial": "ACTRAPID",
-    "principioActivo": "Insulina regular (rápida)",
+    "nombreComercial": "ACTRAPID / HUMULINA REGULAR",
+    "principioActivo": "Insulina regular (soluble)",
     "categoria": "metabolico",
     "presentacion": "Vial multidosis 10 mL = 1.000 UI (100 UI/mL)",
     "volFarmaco": 0.5,
     "diluyente": "SS0,9%",
     "dosisTotal": "50 UI",
-    "nAmp": "0,5 mL de vial",
+    "nAmp": "50 UI (0,5 mL del vial)",
     "conc": {
       "valor": 1,
       "unidad": "UI"
@@ -1082,17 +1091,17 @@
         "unidad": "UI/h"
       }
     ],
-    "observaciones": "PURGAR 20 mL del sistema antes de conectar (la insulina se adsorbe al PVC). Titular según glucemia horaria.",
+    "observaciones": "SOLO insulina regular (Actrapid o Humulina Regular). NUNCA NPH ni mezclas por vía IV. El vial contiene 1.000 UI: se usan solo 50 UI. Purgar la línea con la propia dilución antes de conectar (la insulina se adsorbe al plástico). Titular según glucemia horaria.",
     "alertas": [],
     "contraindicaciones": "Hipoglucemia",
     "incompatibilidades": null,
-    "dilucion": "0,5 mL de vial (50 UI) + 49.5 mL SS0,9% → VOLUMEN FINAL 50 mL"
+    "dilucion": "50 UI (0,5 mL del vial, medidas con jeringa de insulina) + 49,5 mL SS0,9% → VOLUMEN FINAL 50 mL"
   },
   {
     "id": "furosemida",
     "nombreComercial": "SEGURIL",
     "principioActivo": "Furosemida",
-    "categoria": "metabolico",
+    "categoria": "diuretico",
     "presentacion": "1 amp 2 mL = 20 mg (10 mg/mL)",
     "volFarmaco": 10,
     "diluyente": "SS0,9%",
@@ -1112,7 +1121,7 @@
         "unidad": "mg/h"
       }
     ],
-    "observaciones": "Dosis fija. Inicio habitual 10 mg/h = 5 mL/h. Titular según diuresis. NO diluir en SG5% (pH ácido).",
+    "observaciones": "Dosis fija. Inicio habitual 10 mg/h = 5 mL/h. Titular según diuresis. NO diluir en SG5% (pH ácido). ATENCIÓN EN TRASLADOS: la jeringa hospitalaria habitual es de 250 mg/50 mL (5 mg/mL); con esa, 10 mg/h = 2 mL/h. Comprobar siempre la concentración de la jeringa que trae el paciente antes de programar el ritmo.",
     "alertas": [],
     "contraindicaciones": "Hipovolemia, anuria, hipopotasemia grave",
     "incompatibilidades": "Incompatible con SG5% y soluciones ácidas",
@@ -1122,7 +1131,7 @@
     "id": "omeprazol",
     "nombreComercial": "LOSEC / NEXIUM",
     "principioActivo": "Omeprazol / Esomeprazol",
-    "categoria": "otro",
+    "categoria": "digestivo",
     "presentacion": "1 vial polvo = 40 mg",
     "volFarmaco": 0,
     "polvo": true,
@@ -1208,5 +1217,93 @@
     "contraindicaciones": null,
     "incompatibilidades": null,
     "dilucion": "10 amp (4 mg) + 40 mL SG5% o SS0,9% → VOLUMEN FINAL 50 mL"
+  },
+  {
+    "id": "somatostatina",
+    "nombreComercial": "SOMATOSTATINA",
+    "principioActivo": "Somatostatina",
+    "categoria": "digestivo",
+    "presentacion": "1 vial polvo = 3 mg",
+    "volFarmaco": 0,
+    "polvo": true,
+    "diluyente": "SS0,9%",
+    "dosisTotal": "3 mg",
+    "nAmp": "1 vial",
+    "conc": {
+      "valor": 60,
+      "unidad": "µg"
+    },
+    "concTexto": "1 mL = 60 µg",
+    "bolo": "250 µg IV lento (en ≥3 min) al iniciar la perfusión",
+    "modos": [
+      {
+        "nombre": "Perfusión",
+        "min": 250,
+        "max": 250,
+        "unidad": "µg/h"
+      }
+    ],
+    "boloModos": [
+      {
+        "label": "Bolo inicial",
+        "mgFijo": 250,
+        "conc": 60,
+        "unidadBolo": "µg",
+        "origen": "de la jeringa ya preparada"
+      }
+    ],
+    "observaciones": "Dosis fija: 250 µg/h = 4,17 mL/h (la jeringa dura 12 h). Indicación: hemorragia digestiva alta por varices. Vida media 1–3 min: NO interrumpir la perfusión; si se interrumpe más de 3–5 min, repetir el bolo. Vigilar glucemia.",
+    "alertas": [],
+    "contraindicaciones": null,
+    "incompatibilidades": null,
+    "dilucion": "1 vial (3 mg) — reconstituir y COMPLETAR HASTA 50 mL con SS0,9% (volumen final 50 mL)"
+  },
+  {
+    "id": "acetilcisteina",
+    "nombreComercial": "HIDONAC ANTÍDOTO 20 %",
+    "principioActivo": "Acetilcisteína (NAC)",
+    "categoria": "revertidor",
+    "tipo": "gravedad",
+    "presentacion": "1 vial 25 mL = 5 g (200 mg/mL)",
+    "volFarmaco": null,
+    "puro": true,
+    "dilucion": "EN SUERO POR GRAVEDAD — no cabe en perfusor de jeringa de 50 mL. Ver calculadora por fases.",
+    "conc": {
+      "valor": 200,
+      "unidad": "mg"
+    },
+    "concTexto": "200 mg/mL (vial sin diluir)",
+    "bolo": null,
+    "modos": [],
+    "pesoMax": 110,
+    "volVial": 25,
+    "gotasPorMl": 20,
+    "fases": [
+      {
+        "nombre": "1.ª fase",
+        "mgKg": 150,
+        "suero": 200,
+        "tipoSuero": "SG5%",
+        "minutos": 60
+      },
+      {
+        "nombre": "2.ª fase",
+        "mgKg": 50,
+        "suero": 500,
+        "tipoSuero": "SG5%",
+        "minutos": 240
+      },
+      {
+        "nombre": "3.ª fase",
+        "mgKg": 100,
+        "suero": 1000,
+        "tipoSuero": "SG5%",
+        "minutos": 960
+      }
+    ],
+    "observaciones": "Intoxicación por paracetamol. Pauta clásica de 3 fases: 300 mg/kg en 21 h. Peso máximo de cálculo: 110 kg. Reacciones anafilactoides sobre todo en la 1.ª fase: parar, tratar y reanudar más lento. La ficha técnica clásica pasa la 1.ª fase en 15 min; aquí se indica en 60 min para reducir reacciones.",
+    "alertas": [],
+    "contraindicaciones": null,
+    "incompatibilidades": null
   }
 ]

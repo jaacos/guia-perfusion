@@ -2158,7 +2158,7 @@ export const defaultDataset: DrugDataset = {
       "estabilidad": "Pendiente de confirmar por Farmacia a estas concentraciones.",
       "concMaxPeriferica": null,
       "referencia": null,
-      "observaciones": "Intoxicación por paracetamol: 300 mg/kg en 21 h, en 5 jeringas de 50 mL. Los ritmos son fijos (no dependen del peso); con el peso solo cambian los mL de NAC de cada jeringa. ETIQUETAR cada jeringa con fase y ritmo: las de mantenimiento 1 y 2 tienen la misma preparación pero van a ritmos distintos. Reacciones anafilactoides sobre todo en la carga: parar, tratar y reanudar más lento. Concentraciones muy superiores a la dilución de ficha técnica: estabilidad en jeringa y uso por vía periférica pendientes de Farmacia. Peso máximo de cálculo: 110 kg.",
+      "observaciones": "Intoxicación por paracetamol: 300 mg/kg en 21 h, en 5 jeringas de 50 mL. Los ritmos son fijos (no dependen del peso); con el peso solo cambian los mL de NAC de cada jeringa. ETIQUETAR cada jeringa con fase y ritmo: las de mantenimiento 1 y 2 tienen la misma preparación pero van a ritmos distintos. CARGA CON DOS PERFUSORES: las dos jeringas de carga a la vez, a 50 mL/h cada una durante 1 h (misma dosis). Cambiar a la siguiente jeringa cuando avise la bomba, no por reloj (con 6,3 mL/h la jeringa termina unos 4 min antes de las 8 h). Reacciones anafilactoides sobre todo en la carga: parar, tratar y reanudar más lento. Concentraciones muy superiores a la dilución de ficha técnica: estabilidad en jeringa y uso por vía periférica pendientes de Farmacia. Peso máximo de cálculo: 110 kg.",
       "alertas": [
         "bombaICC"
       ],

@@ -13,8 +13,9 @@ import {
   recalcularPorAmpollas,
   maxAmpollas,
   tieneSelectorAmpollas,
-  esGravedad,
-  calcularFases,
+  esJeringasFases,
+  calcularJeringasFases,
+  minTxt,
   rangoDosisTxt,
   duracionTxt,
   normalize,
@@ -66,7 +67,7 @@ export const DrugModal: React.FC<DrugModalProps> = ({
 
   const maxAmp = maxAmpollas(farmaco);
   const conSelector = tieneSelectorAmpollas(farmaco);
-  const gravedad = esGravedad(farmaco);
+  const fasesJ = esJeringasFases(farmaco);
   const mismoNombre = normalize(farmaco.nombreComercial) === normalize(farmaco.principioActivo);
 
   const handleUpdateAmpollas = (val: number) => {
@@ -118,7 +119,7 @@ export const DrugModal: React.FC<DrugModalProps> = ({
   const hayPerf = Array.isArray(farmaco.modos) && farmaco.modos.length > 0;
   const hayBolo = Array.isArray(farmaco.boloModos) && farmaco.boloModos.length > 0;
   const multiModo = hayPerf && farmaco.modos && farmaco.modos.length > 1;
-  const usaPeso = gravedad || farmacoPorPeso(farmaco) || (farmaco.boloModos || []).some(b => b.fijo == null);
+  const usaPeso = fasesJ || farmacoPorPeso(farmaco) || (farmaco.boloModos || []).some(b => b.fijo == null);
 
   const pills: { label: string; className: string }[] = [];
   (farmaco.alertas || []).forEach(a => {
@@ -403,7 +404,7 @@ export const DrugModal: React.FC<DrugModalProps> = ({
                 {concTexto(farmacoEfectivo)}
               </span>
             </div>
-            <div className={`grid grid-cols-1 sm:grid-cols-3 gap-1 py-1 border-b border-slate-800/40 ${gravedad ? 'hidden' : ''}`}>
+            <div className={`grid grid-cols-1 sm:grid-cols-3 gap-1 py-1 border-b border-slate-800/40`}>
               <span className="font-mono text-slate-400 uppercase text-[11px]">Volumen final</span>
               <span className="sm:col-span-2 text-white font-semibold font-mono">
                 {farmacoEfectivo.volumenFinal} mL
@@ -598,11 +599,11 @@ export const DrugModal: React.FC<DrugModalProps> = ({
           </div>
         )}
 
-        {/* Section: Infusión por gravedad (no cabe en jeringa) */}
-        {gravedad && (
+        {/* Section: Pauta por fases en jeringas */}
+        {fasesJ && (
           <div className="mt-4 bg-[#182030]/60 border border-orange-500/20 rounded-xl p-4">
             <div className="font-mono text-[11px] uppercase tracking-wider text-orange-400 font-bold mb-3">
-              ⊕ Preparación por fases (suero por gravedad)
+              ⊕ Preparación por fases (jeringas de {farmaco.volumenFinal} mL)
             </div>
             {peso == null ? (
               <div className="bg-red-950/30 border border-red-500/30 rounded-lg p-3 text-xs font-mono text-red-300">
@@ -610,33 +611,42 @@ export const DrugModal: React.FC<DrugModalProps> = ({
               </div>
             ) : (
               (() => {
-                const g = calcularFases(farmaco, peso);
+                const g = calcularJeringasFases(farmaco, peso);
                 return (
                   <div className="space-y-2.5">
                     {g.fases.map((fa, idx) => (
                       <div key={idx} className="bg-[#111620] border border-slate-800 rounded-lg p-3.5">
                         <div className="font-mono text-[11px] uppercase tracking-wider text-slate-400 mb-1">
-                          {fa.nombre} — {fmt(fa.mgKg)} mg/kg en{' '}
-                          {fa.minutos < 120 ? `${fa.minutos} min` : `${fmt(fa.minutos / 60)} h`}
+                          {fa.nombre} — {fmt(fa.mgKg)} mg/kg en {minTxt(fa.minutos)} ·{' '}
+                          {fa.jeringas === 1 ? '1 jeringa' : `${fa.jeringas} jeringas iguales, una tras otra`}
                         </div>
                         <div className="font-mono text-xl font-bold text-orange-400">
-                          {fmt(fa.mL)} mL de fármaco ({fmt(fa.mg / 1000)} g)
+                          {fmtRitmo(fa.mLh, meta)} mL/h
+                          <span className="text-sm text-slate-300 font-semibold">
+                            {' '}· {minTxt(fa.minJeringa)} por jeringa
+                          </span>
                         </div>
-                        <div className="text-xs text-slate-400 mt-1 font-mono">
-                          Añadir a {fa.suero} mL de {farmaco.diluyente} ·{' '}
-                          <span className="text-white font-semibold">{fmt(fa.mLh)} mL/h</span> ≈{' '}
-                          <span className="text-white font-semibold">{fa.gotasMin} gotas/min</span> (equipo de{' '}
-                          {g.gotas} gotas/mL)
+                        <div className="text-xs text-slate-300 mt-1 font-mono">
+                          Cada jeringa:{' '}
+                          <span className="text-white font-semibold">{fmt(Math.round(fa.mLFarmaco * 100) / 100)} mL de NAC</span>{' '}
+                          + {fmt(Math.round(fa.mLDiluyente * 100) / 100)} mL {farmaco.diluyente} → {farmaco.volumenFinal} mL ·{' '}
+                          {fmt(Math.round(fa.concJeringa * 10) / 10)} mg/mL ({fmt(fa.mgJeringa / 1000)} g)
                         </div>
                       </div>
                     ))}
                     <div className="text-xs text-slate-300 font-mono">
-                      Total: {fmt(g.mLTotal)} mL de fármaco
-                      {g.viales != null ? ` ≈ ${g.viales} viales de ${farmaco.volVial} mL` : ''}.
+                      Total: {fmt(Math.round(g.mLTotal * 100) / 100)} mL de NAC
+                      {g.viales != null ? ` ≈ ${g.viales} viales de ${farmaco.volVial} mL` : ''} ·{' '}
+                      {g.fases.reduce((s, x) => s + x.jeringas, 0)} jeringas.
                     </div>
                     {g.limitado && (
                       <div className="text-xs font-mono text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded p-2 font-medium">
                         ⚠ Calculado con el peso máximo de {farmaco.pesoMaxCalculo} kg.
+                      </div>
+                    )}
+                    {g.noCabe && (
+                      <div className="text-xs font-mono text-red-300 bg-red-950/40 border border-red-500/40 rounded p-2 font-semibold">
+                        DATO NO VÁLIDO — el fármaco no cabe en la jeringa. NO USAR.
                       </div>
                     )}
                   </div>

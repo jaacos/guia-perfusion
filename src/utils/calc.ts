@@ -65,8 +65,8 @@ export function dosisAmLh(
   return (dose * (porPeso ? (kg as number) : 1) * U_TIEMPO[tiempo] * f) / conc.valor;
 }
 
-export const esGravedad = (f: Farmaco): boolean =>
-  f.tipo === 'gravedad' && Array.isArray(f.fases) && f.fases.length > 0;
+export const esJeringasFases = (f: Farmaco): boolean =>
+  f.tipo === 'jeringasFases' && Array.isArray(f.fases) && f.fases.length > 0;
 
 /** "250 µg/h" si min = max; "1–6 mg/kg/h" si es un rango */
 export const rangoDosisTxt = (min: number, max: number, unidad: string): string =>
@@ -95,24 +95,40 @@ export function maxAmpollas(f: Farmaco): number {
 
 /** ¿Tiene sentido ofrecer el selector de ampollas en este fármaco? */
 export const tieneSelectorAmpollas = (f: Farmaco): boolean =>
-  !!f.dosisPorAmp && !esGravedad(f) && maxAmpollas(f) > 1;
+  !!f.dosisPorAmp && !esJeringasFases(f) && maxAmpollas(f) > 1;
 
-/** Volumen de fármaco y ritmo de goteo de cada fase, para un peso dado */
-export function calcularFases(f: Farmaco, kg: number) {
+/**
+ * Pauta por fases en jeringas de volumenFinal mL. f.conc es la concentración
+ * del VIAL. Cada fase se reparte en jeringas iguales que se pasan una tras
+ * otra, así que el ritmo es volumen de la jeringa / duración de cada jeringa.
+ * El ritmo no depende del peso; con el peso solo cambia el fármaco por jeringa.
+ */
+export function calcularJeringasFases(f: Farmaco, kg: number) {
+  const vol = f.volumenFinal;
   const kgCalc = f.pesoMaxCalculo ? Math.min(kg, f.pesoMaxCalculo) : kg;
-  const gotas = f.gotasPorMl || 20;
   const fases = (f.fases || []).map(fa => {
-    const mg = fa.mgKg * kgCalc;
-    const mL = mg / f.conc.valor;
-    const mLh = (fa.suero + mL) / (fa.minutos / 60);
-    return { ...fa, mg, mL, mLh, gotasMin: Math.round((mLh * gotas) / 60) };
+    const mgFase = fa.mgKg * kgCalc;
+    const mgJeringa = mgFase / fa.jeringas;
+    const mLFarmaco = mgJeringa / f.conc.valor;
+    const minJeringa = fa.minutos / fa.jeringas;
+    return {
+      ...fa, mgFase, mgJeringa, mLFarmaco,
+      mLDiluyente: vol - mLFarmaco,
+      concJeringa: mgJeringa / vol,
+      minJeringa,
+      mLh: vol / (minJeringa / 60),
+    };
   });
-  const mLTotal = fases.reduce((s, x) => s + x.mL, 0);
+  const mLTotal = fases.reduce((s, x) => s + x.mLFarmaco * x.jeringas, 0);
   return {
-    fases, kgCalc, gotas, mLTotal, limitado: kg > kgCalc,
+    fases, kgCalc, mLTotal, limitado: kg > kgCalc,
+    noCabe: fases.some(x => x.mLFarmaco > vol + 1e-9),
     viales: f.volVial ? Math.ceil(mLTotal / f.volVial - 1e-9) : null,
   };
 }
+
+const minTxt = (m: number) => (m < 120 ? fmt(m) + ' min' : fmt(m / 60) + ' h');
+export { minTxt };
 
 export const esPorPeso = (unidad: string): boolean => String(unidad).split('/').length === 3;
 
@@ -142,7 +158,10 @@ export function ritmoRef(
   kg: number,
   meta: MetaData = DEFAULT_META
 ): { texto: string; porPeso: boolean } {
-  if (esGravedad(f)) return { texto: `${f.fases!.length} fases por gravedad`, porPeso: true };
+  if (esJeringasFases(f)) {
+    const g = calcularJeringasFases(f, kg);
+    return { texto: g.fases.map(x => `${x.nombre}: ${fmtRitmo(x.mLh, meta)} mL/h`).join(' · '), porPeso: true };
+  }
   if (!f.modos || !f.modos.length) return { texto: 'Solo bolo', porPeso: false };
   const partes = f.modos.map(m => {
     const a = dosisAmLh(m.min, m.unidad, kg, f.conc, meta);
@@ -158,6 +177,7 @@ export function ritmoRef(
 
 /** El texto de concentración se DERIVA de conc: no puede divergir del cálculo. */
 export function concTexto(f: Farmaco): string {
+  if (esJeringasFases(f)) return 'Vial: 1 mL = ' + fmt(f.conc.valor) + ' ' + f.conc.unidad + ' · en jeringa según fase y peso';
   const u = f.conc.unidad;
   let t = '1 mL = ' + fmt(f.conc.valor) + ' ' + u;
   if (u === MICRO + 'g' && f.conc.valor >= 1000) t += ' (' + fmt(f.conc.valor / 1000) + ' mg)';
@@ -170,7 +190,7 @@ export function concTexto(f: Farmaco): string {
  * del número de ampollas o viales seleccionados en la preparación de la perfusión.
  */
 export function recalcularPorAmpollas(f: Farmaco, numAmpollas: number): Farmaco {
-  if (numAmpollas <= 0 || !f.dosisPorAmp || esGravedad(f)) return f;
+  if (numAmpollas <= 0 || !f.dosisPorAmp || esJeringasFases(f)) return f;
   // Preparación estándar: se respeta el texto validado del dato, sin regenerarlo
   if (numAmpollas === (f.ampollasBase || 1)) return f;
   numAmpollas = Math.min(numAmpollas, maxAmpollas(f));
@@ -289,8 +309,8 @@ export function validarFarmaco(f: Farmaco, meta: MetaData = DEFAULT_META): strin
   if (e.length) return e;
 
   if (!CATEGORIAS[f.categoria]) e.push('categoría desconocida: ' + f.categoria);
-  const grav = f.tipo === 'gravedad';
-  if (!grav && !(f.volumenFinal > 0)) e.push('volumenFinal inválido');
+  const fasesJ = f.tipo === 'jeringasFases';
+  if (!(f.volumenFinal > 0)) e.push('volumenFinal inválido');
   if (!(f.conc.valor > 0)) e.push('conc.valor inválido');
   if (!U_DOSIS.includes(f.conc.unidad)) e.push('conc.unidad no reconocida: ' + f.conc.unidad);
   if (f.conc.unidad && f.conc.unidad.includes(MU_GRIEGA)) {
@@ -298,12 +318,16 @@ export function validarFarmaco(f: Farmaco, meta: MetaData = DEFAULT_META): strin
   }
 
   // La concentración declarada debe cuadrar con la dilución descrita
-  if (grav) {
-    if (!Array.isArray(f.fases) || !f.fases.length) e.push('ficha por gravedad sin fases');
+  if (fasesJ) {
+    if (!Array.isArray(f.fases) || !f.fases.length) e.push('pauta por fases sin fases');
     (f.fases || []).forEach(fa => {
-      if (!(fa.mgKg > 0 && fa.suero > 0 && fa.minutos > 0)) e.push("fase inválida: " + fa.nombre);
+      if (!(fa.mgKg > 0 && fa.minutos > 0 && Number.isInteger(fa.jeringas) && fa.jeringas >= 1)) e.push('fase inválida: ' + fa.nombre);
     });
-    if (f.conc.unidad !== 'mg') e.push('ficha por gravedad: conc debe ir en mg/mL');
+    if (f.conc.unidad !== 'mg') e.push('pauta por fases: conc (vial) debe ir en mg/mL');
+    if (!(f.pesoMaxCalculo && f.pesoMaxCalculo > 0)) e.push('pauta por fases sin peso máximo de cálculo');
+    else if (Array.isArray(f.fases) && f.conc.valor > 0 && calcularJeringasFases(f, f.pesoMaxCalculo).noCabe) {
+      e.push('al peso máximo el fármaco no cabe en la jeringa');
+    }
   } else if (f.dosisTotalNum != null && f.dosisTotalUnidad) {
     const fac = FACTOR[f.dosisTotalUnidad]?.[f.conc.unidad];
     if (fac == null) {

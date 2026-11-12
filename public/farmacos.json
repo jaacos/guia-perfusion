@@ -2112,16 +2112,15 @@
       "nombreComercial": "HIDONAC ANTÍDOTO 20 %",
       "principioActivo": "Acetilcisteína (NAC)",
       "categoria": "revertidor",
-      "tipo": "gravedad",
+      "tipo": "jeringasFases",
       "presentacion": "1 vial 25 mL = 5 g (200 mg/mL)",
-      "puro": true,
       "volFarmaco": 0,
       "diluyente": "SG5%",
       "dosisTotalNum": null,
       "dosisTotalUnidad": null,
       "nAmp": "Según peso",
-      "volumenFinal": 0,
-      "dilucion": "EN SUERO POR GRAVEDAD — no cabe en perfusor de jeringa de 50 mL. Ver calculadora por fases.",
+      "volumenFinal": 50,
+      "dilucion": "Por fases, en jeringas de 50 mL: NAC del vial + SG5% hasta 50 mL. Los mL de NAC de cada jeringa salen de la calculadora según el peso.",
       "conc": {
         "valor": 200,
         "unidad": "mg"
@@ -2131,37 +2130,38 @@
       "modos": [],
       "pesoMaxCalculo": 110,
       "volVial": 25,
-      "gotasPorMl": 20,
       "fases": [
         {
-          "nombre": "1.ª fase",
+          "nombre": "Carga",
           "mgKg": 150,
-          "suero": 200,
+          "jeringas": 2,
           "minutos": 60
         },
         {
-          "nombre": "2.ª fase",
+          "nombre": "Mantenimiento 1",
           "mgKg": 50,
-          "suero": 500,
+          "jeringas": 1,
           "minutos": 240
         },
         {
-          "nombre": "3.ª fase",
+          "nombre": "Mantenimiento 2",
           "mgKg": 100,
-          "suero": 1000,
+          "jeringas": 2,
           "minutos": 960
         }
       ],
       "pesoDosificacion": "real",
-      "estabilidad": "Pendiente de confirmar por Farmacia.",
+      "estabilidad": "Pendiente de confirmar por Farmacia a estas concentraciones.",
       "concMaxPeriferica": null,
       "referencia": null,
-      "observaciones": "Intoxicación por paracetamol. Pauta clásica de 3 fases: 300 mg/kg en 21 h. Peso máximo de cálculo: 110 kg. Reacciones anafilactoides sobre todo en la 1.ª fase: parar, tratar y reanudar más lento. La ficha técnica clásica pasa la 1.ª fase en 15 min; aquí se indica en 60 min para reducir reacciones.",
-      "alertas": [],
+      "observaciones": "Intoxicación por paracetamol: 300 mg/kg en 21 h, en 5 jeringas de 50 mL. Los ritmos son fijos (no dependen del peso); con el peso solo cambian los mL de NAC de cada jeringa. ETIQUETAR cada jeringa con fase y ritmo: las de mantenimiento 1 y 2 tienen la misma preparación pero van a ritmos distintos. Reacciones anafilactoides sobre todo en la carga: parar, tratar y reanudar más lento. Concentraciones muy superiores a la dilución de ficha técnica: estabilidad en jeringa y uso por vía periférica pendientes de Farmacia. Peso máximo de cálculo: 110 kg.",
+      "alertas": [
+        "bombaICC"
+      ],
       "contraindicaciones": null,
       "incompatibilidades": null,
       "estado": "revisar",
-      "notaRevision": "Añadido en v2.1.0. Confirmar presentación (5 g/25 mL) y pauta con Farmacia."
+      "notaRevision": "v2.1.0: esquema en jeringas de 50 mL propuesto por el equipo. Pendiente de Farmacia: estabilidad, vía periférica y peso máximo."
     }
   ]
 }

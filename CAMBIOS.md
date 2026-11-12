@@ -21,7 +21,7 @@ Todo lo clínico sigue pendiente de validación por Farmacia. Los dos fármacos 
 - Amiodarona: tercer modo «900 mg/24 h (ritmo constante)» = 6,3 mL/h con la misma jeringa.
 - Midazolam: añadida la ampolla de 5 mg/5 mL como «otra presentación».
 - Esmolol: eliminada la referencia a bomba volumétrica (no hay en la dotación).
-- Nuevos: Somatostatina (3 mg/50 mL) y Acetilcisteína — Hidonac Antídoto, como ficha «por gravedad» con cálculo por fases.
+- Nuevos: Somatostatina (3 mg/50 mL) y Acetilcisteína — Hidonac Antídoto, en 5 jeringas de 50 mL: carga 2 × 30 min a 100 mL/h, mantenimiento 1 a 12,5 mL/h (4 h), mantenimiento 2 2 × 8 h a 6,25 mL/h. Ritmos fijos; el peso solo cambia los mL de NAC por jeringa. Tope de cálculo 110 kg.
 
 **Calidad**
 - Una sola fuente de datos: `public/farmacos.json`. La copia empaquetada (`src/data/defaultDataset.ts`) se regenera sola en cada `dev`/`build`.

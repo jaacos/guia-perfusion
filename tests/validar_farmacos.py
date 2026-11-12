@@ -39,10 +39,18 @@ for f in L:
     e = lambda m: errores.append(f"{f['id']}: {m}")
     try:
         conc = f['conc']
-        if f.get('tipo') == 'gravedad':
-            if not f.get('fases'): e('ficha por gravedad sin fases')
-            for fa in f.get('fases', []):
-                if min(fa['mgKg'], fa['suero'], fa['minutos']) <= 0: e(f"fase inválida: {fa['nombre']}")
+        if f.get('tipo') == 'jeringasFases':
+            vol, fases = f['volumenFinal'], f.get('fases') or []
+            if not fases: e('pauta por fases sin fases')
+            for kg in (META['pesoMin'], 70, f['pesoMaxCalculo']):
+                for fa in fases:
+                    mg_jer = fa['mgKg'] * kg / fa['jeringas']
+                    ml_nac = mg_jer / conc['valor']
+                    ritmo = vol / (fa['minutos'] / fa['jeringas'] / 60)
+                    # lo que entra a ese ritmo durante la fase debe ser exactamente la dosis de la fase
+                    entregado = ritmo * fa['minutos'] / 60 * (mg_jer / vol)
+                    if abs(entregado - fa['mgKg'] * kg) > 1e-6 * entregado: e(f"{fa['nombre']} @{kg} kg: entra {entregado:g} mg, debería {fa['mgKg'] * kg:g}")
+                    if ml_nac > vol + 1e-9: e(f"{fa['nombre']} @{kg} kg: {ml_nac:g} mL de fármaco no caben en {vol} mL")
             continue
 
         vol = f['volumenFinal']

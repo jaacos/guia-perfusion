@@ -51,12 +51,12 @@ export interface BoloModo {
   maxDosis?: number;
 }
 
-/** Fase de una infusión en suero por gravedad (fármacos que no caben en jeringa) */
-export interface FaseGravedad {
+/** Fase de una pauta en varias jeringas de volumenFinal mL (p. ej. acetilcisteína) */
+export interface FaseJeringas {
   nombre: string;
-  mgKg: number;
-  suero: number;   // mL de suero
-  minutos: number; // duración de la fase
+  mgKg: number;    // dosis TOTAL de la fase
+  jeringas: number; // jeringas iguales en que se reparte la fase, una tras otra
+  minutos: number; // duración TOTAL de la fase
 }
 
 export interface ModoPerfusion {
@@ -103,11 +103,10 @@ export interface Farmaco {
   tipoEnvase?: 'amp' | 'vial' | string;
   envaseTxt?: string;        // texto del envase en la receta, p. ej. 'amp al 1 %'
   maxAmpollas?: number;      // tope del selector de ampollas
-  tipo?: 'gravedad' | string; // 'gravedad' = en suero, no en jeringa
-  fases?: FaseGravedad[];
+  tipo?: 'jeringasFases' | string; // pauta por fases en varias jeringas
+  fases?: FaseJeringas[];
   pesoMaxCalculo?: number;
   volVial?: number;
-  gotasPorMl?: number;
 }
 
 export interface DrugDataset {
